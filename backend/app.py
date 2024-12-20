@@ -31,11 +31,6 @@ with app.app_context():
     print("Tablas detectadas por SQLAlchemy:", db.metadata.tables.keys())
 
 
-
-
-
-
-
 @app.route('/api', methods=['GET'])
 def home():
     return jsonify({"message": "Hello from Flask!"})
