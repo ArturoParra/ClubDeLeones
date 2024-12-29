@@ -11,7 +11,7 @@ export default {
         'secondary': '#E3672D',  // Naranja
         'accent': '#FEC80B',     // Amarillo
         'neutral': '#9ca3af'      //Gris
-      }
+      },
     },
   },
   plugins: [],
