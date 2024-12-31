@@ -19,13 +19,6 @@ app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'
 db = SQLAlchemy(app)
 
 #? Creación de la base de datos
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-
-    def __repr__(self):
-        return f'<User {self.username}>'
 
 class Entrenador(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -35,6 +28,17 @@ class Entrenador(db.Model):
 
     def __repr__(self):
         return f'<Entrenador {self.nombre}>'
+
+class Competidor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(80), nullable=False)
+    fecha_nacimiento = db.Column(db.Date, nullable=False)
+    categoria = db.Column(db.String(1), nullable=False)
+    foto = db.Column(db.LargeBinary)
+
+    def __repr__(self):
+        return f'<Competidor {self.nombre}>'
+
 
 # Crear todas las tablas
 with app.app_context():
