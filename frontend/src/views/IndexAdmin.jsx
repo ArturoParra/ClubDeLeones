@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { EventoCard } from "../components/EventoCard";
 import { Link } from "react-router-dom";
@@ -7,152 +7,26 @@ export const IndexAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [eventos, setEventos] = useState([]);
   const eventosPerPage = 12;
 
-  const eventos = [
-    {
-      id: 1,
-      nombre: "Torneo Regional 2024",
-      fecha: "2024-03-15",
-      tipo: "Torneo",
-      categorias: ["Junior", "Senior", "Master"],
-    },
-    {
-      id: 2,
-      nombre: "Conferencia de Liderazgo",
-      fecha: "2024-04-20",
-      tipo: "Conferencia",
-      categorias: ["General"],
-    },
-    {
-      id: 3,
-      nombre: "Campeonato Estatal",
-      fecha: "2024-05-10",
-      tipo: "Torneo",
-      categorias: ["Juvenil", "Adulto"],
-    },
-    {
-      id: 4,
-      nombre: "Exposición de Arte Juvenil",
-      fecha: "2024-06-05",
-      tipo: "Exposición",
-      categorias: ["Arte", "Juvenil"],
-    },
-    {
-      id: 5,
-      nombre: "Festival de Música 2024",
-      fecha: "2024-07-15",
-      tipo: "Festival",
-      categorias: ["Coral", "Orquesta"],
-    },
-    {
-      id: 6,
-      nombre: "Torneo Nacional de Verano",
-      fecha: "2024-08-01",
-      tipo: "Torneo",
-      categorias: ["Juvenil", "Master"],
-    },
-    {
-      id: 7,
-      nombre: "Concurso de Fotografía",
-      fecha: "2024-09-10",
-      tipo: "Concurso",
-      categorias: ["Junior", "Senior"],
-    },
-    {
-      id: 8,
-      nombre: "Seminario de Innovación",
-      fecha: "2024-10-05",
-      tipo: "Seminario",
-      categorias: ["General"],
-    },
-    {
-      id: 9,
-      nombre: "Carrera Atlética Anual",
-      fecha: "2024-11-12",
-      tipo: "Competencia",
-      categorias: ["5K", "10K"],
-    },
-    {
-      id: 10,
-      nombre: "Feria Tecnológica",
-      fecha: "2024-12-01",
-      tipo: "Feria",
-      categorias: ["General"],
-    },
-    {
-      id: 11,
-      nombre: "Encuentro de Voluntarios",
-      fecha: "2025-01-20",
-      tipo: "Encuentro",
-      categorias: ["General"],
-    },
-    {
-      id: 12,
-      nombre: "Campeonato de Invierno",
-      fecha: "2025-02-10",
-      tipo: "Torneo",
-      categorias: ["Senior", "Master"],
-    },
-    {
-      id: 13,
-      nombre: "Taller de Desarrollo Personal",
-      fecha: "2025-03-05",
-      tipo: "Taller",
-      categorias: ["General"],
-    },
-    {
-      id: 14,
-      nombre: "Feria de Ciencias",
-      fecha: "2025-04-15",
-      tipo: "Feria",
-      categorias: ["Junior", "Senior"],
-    },
-    {
-      id: 15,
-      nombre: "Competencia de Robótica",
-      fecha: "2025-05-20",
-      tipo: "Competencia",
-      categorias: ["Juvenil", "Adulto"],
-    },
-    {
-      id: 16,
-      nombre: "Cumbre Anual de Líderes",
-      fecha: "2025-06-10",
-      tipo: "Cumbre",
-      categorias: ["General"],
-    },
-    {
-      id: 17,
-      nombre: "Exposición Fotográfica",
-      fecha: "2025-07-05",
-      tipo: "Exposición",
-      categorias: ["Arte", "Juvenil"],
-    },
-    {
-      id: 18,
-      nombre: "Maratón Internacional",
-      fecha: "2025-08-15",
-      tipo: "Competencia",
-      categorias: ["10K", "21K", "42K"],
-    },
-    {
-      id: 19,
-      nombre: "Festival de Gastronomía",
-      fecha: "2025-09-25",
-      tipo: "Festival",
-      categorias: ["General"],
-    },
-    {
-      id: 20,
-      nombre: "Encuentro de Arte y Cultura",
-      fecha: "2025-10-30",
-      tipo: "Encuentro",
-      categorias: ["Arte", "Cultura"],
-    },
-  ];
+  useEffect(() => {
+    const fecthEventos = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5000/api/consultareventos"
+        );
+        if (!response.ok) throw new Error("Error al cargar eventos");
+        const data = await response.json();
+        setEventos(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fecthEventos();
+  }, []);
 
-  const categorias = ["Junior", "Senior", "Master"];
+  const categorias = ["A", "B", "C", "D", "E"];
 
   const handleCategoryChange = (categoria) => {
     setSelectedCategories((prev) =>
@@ -225,8 +99,8 @@ export const IndexAdmin = () => {
 
           {/* Grid de eventos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {currentEventos.map((event) => (
-              <EventoCard key={event.id} event={event} />
+            {currentEventos.map((evento) => (
+              <EventoCard key={evento.id} evento={evento} />
             ))}
           </div>
 

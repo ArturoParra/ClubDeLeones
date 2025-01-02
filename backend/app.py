@@ -206,6 +206,22 @@ def get_disciplinas():
         } for d in disciplinas]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/consultareventos', methods=['GET'])
+def consultar_eventos():
+    try:
+        eventos = Evento.query.all()
+        return jsonify([{
+            'id': e.id,
+            'nombre': e.nombre,
+            'fecha_inicio': e.fecha_inicio.strftime('%Y-%m-%d'),
+            'fecha_fin': e.fecha_fin.strftime('%Y-%m-%d') if e.fecha_fin else None,
+            'disciplina': e.disciplina.nombre,
+            'categorias': e.categorias.split(','),
+            'archivo_url': e.archivo_url
+        } for e in eventos]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/eventos', methods=['POST'])
 def crear_evento():
