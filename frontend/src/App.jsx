@@ -5,6 +5,7 @@ import { LoginAdmin } from "./views/LoginAdmin";
 import { LoginEntrenador } from "./views/LoginEntrenador";
 import { SingupEntrenador } from "./views/SingupEntrenador";
 import { IndexEntrenador } from "./views/IndexEntrenador";
+import { IndexAdmin } from "./views/IndexAdmin";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -23,6 +24,7 @@ function App() {
       <Route path="/EntrenadorLogin" element={<LoginEntrenador />} />
       <Route path="/RegistroEntrenador" element={<SingupEntrenador />} />
       <Route path="/IndexEntrenador" element={<IndexEntrenador />} />
+      <Route path="/IndexAdmin" element={<IndexAdmin />} />
     </Routes>
   );
 }

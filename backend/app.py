@@ -14,7 +14,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:acuario16@localhost/clubdeleones'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'
+app.config['SECRET_KEY'] = '1234'
 
 db = SQLAlchemy(app)
 
@@ -38,6 +38,13 @@ class Competidor(db.Model):
 
     def __repr__(self):
         return f'<Competidor {self.nombre}>'
+
+class EntrenadorCompetidor(db.Model):
+    __tablename__ = 'entrenador_competidor'
+    id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), primary_key=True)
+    id_entrenador = db.Column(db.Integer, db.ForeignKey('entrenador.id'), primary_key=True)
+    competidor = db.relationship('Competidor', backref='entrenadores')
+    entrenador = db.relationship('Entrenador', backref='competidores')
 
 
 # Crear todas las tablas
@@ -112,15 +119,12 @@ def login_entrenador():
                 'email': entrenador.email,
                 'exp': exp_time.timestamp()
             }
-            print("Token payload:", token_payload)  # Debug print 3
-            
+
             token = jwt.encode(
                 token_payload,
                 app.config['SECRET_KEY'],
                 algorithm='HS256'
             )
-            print("Token generado:", token)  # Debug print 4
-            print("Tipo del token:", type(token))
 
             return jsonify({
                 "message": "Login exitoso",
@@ -133,6 +137,46 @@ def login_entrenador():
 
     except Exception as e:
         return jsonify({"message": f"Error en el servidor: {str(e)}"}), 500
+
+@app.route('/api/login/admin', methods=['POST'])
+def login_admin():
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+
+        # Hardcoded admin credentials for demo
+        if email == "admin@leones.com" and password == "admin123":
+            token_payload = {
+                'role': 'admin',
+                'email': email,
+                'exp': datetime.now(timezone.utc) + timedelta(hours=24)
+            }
+            
+            token = jwt.encode(
+                token_payload,
+                app.config['SECRET_KEY'],
+                algorithm='HS256'
+            )
+
+            return jsonify({
+                "status": "success",
+                "message": "Login exitoso",
+                "token": token,
+                "nombre": "Administrador"
+            }), 200
+            
+        return jsonify({
+            "status": "error",
+            "message": "Credenciales inválidas"
+        }), 401
+        
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": "Error en el servidor"
+        }), 500
+
 
 #! No borrar esto
 if __name__ == '__main__':
