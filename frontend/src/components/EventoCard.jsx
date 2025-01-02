@@ -1,9 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 
 export const EventoCard = ({ evento }) => {
-  const fechaInicio = evento.fecha_inicio ? new Date(evento.fecha_inicio) : null;
-  const fechaFin = evento.fecha_fin ? new Date(evento.fecha_fin) : null;
+  const today = new Date().toISOString().split("T")[0];
+  const fechaInicio = evento.fecha_inicio
+    ? new Date(`${evento.fecha_inicio}T06:00:00Z`)
+    : null;
+  const fechaFin = evento.fecha_fin
+    ? new Date(`${evento.fecha_fin}T06:00:00Z`)
+    : null;
+
+  const inicio = evento.fecha_inicio
+
+  //En curso, Finalizado, Proximo
+  const [estado, setEstado] = useState("");
+
+  useEffect(() => {
+    if (fechaInicio) {
+      const fechaInicioStr = fechaInicio.toISOString().split("T")[0];
+
+      if (fechaInicioStr < today) {
+        setEstado("Finalizado");
+        if (fechaFin) {
+          const fechaFinStr = fechaFin.toISOString().split("T")[0];
+          if (fechaFinStr < today) {
+            setEstado("Finalizado");
+          } else {
+            setEstado("En Curso");
+          }
+        }
+      } else if (fechaInicioStr > today) {
+        setEstado("Proximo");
+      } else {
+        setEstado("En Curso");
+      }
+    } else {
+      setEstado("Sin estado"); // Manejo de fechas inválidas o nulas
+    }
+
+    console.log(evento.fecha_inicio);
+    console.log(inicio > today);
+  }, [fechaInicio, fechaFin, today]);
 
   return (
     <>
@@ -45,6 +82,9 @@ export const EventoCard = ({ evento }) => {
             <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
               {evento.disciplina}
             </span>
+          </div>
+          <div>
+            <span className="text-neutral-dark text-sm">{estado}</span>
           </div>
           {/* Categories */}
           <div>
