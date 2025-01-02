@@ -5,10 +5,9 @@ import { CompetidorCard } from "../components/CompetidorCard";
 export const IndexEntrenador = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1)
-  const competidoresPerPage = 10
+  const [currentPage, setCurrentPage] = useState(1);
+  const competidoresPerPage = 12;
 
-  // Sample data - replace with API call
   const competidores = [
     {
       id: 1,
@@ -22,7 +21,98 @@ export const IndexEntrenador = () => {
       categoria: "Senior",
       foto: "/placeholder.jpg",
     },
+    {
+      id: 3,
+      nombre: "Carlos García",
+      categoria: "Master",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 4,
+      nombre: "Sofía Martínez",
+      categoria: "Junior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 5,
+      nombre: "Luis Fernández",
+      categoria: "Senior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 6,
+      nombre: "Elena Torres",
+      categoria: "Master",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 7,
+      nombre: "Diego Hernández",
+      categoria: "Junior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 8,
+      nombre: "Gabriela Gómez",
+      categoria: "Senior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 9,
+      nombre: "Marcos Ortiz",
+      categoria: "Master",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 10,
+      nombre: "Laura Castillo",
+      categoria: "Junior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 11,
+      nombre: "Pedro Ruiz",
+      categoria: "Senior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 12,
+      nombre: "Camila Mendoza",
+      categoria: "Master",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 13,
+      nombre: "Andrés Rojas",
+      categoria: "Junior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 14,
+      nombre: "Isabel Chávez",
+      categoria: "Senior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 15,
+      nombre: "Rodrigo Moreno",
+      categoria: "Master",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 16,
+      nombre: "Mónica Vega",
+      categoria: "Junior",
+      foto: "/placeholder.jpg",
+    },
+    {
+      id: 17,
+      nombre: "Jorge Salinas",
+      categoria: "Senior",
+      foto: "/placeholder.jpg",
+    },
   ];
+  
 
   const categorias = ["Junior", "Senior", "Master"];
 
@@ -45,18 +135,23 @@ export const IndexEntrenador = () => {
   });
 
   // Pagination logic
-  const indexOfLastCompetidor = currentPage * competidoresPerPage
-  const indexOfFirstCompetidor = indexOfLastCompetidor - competidoresPerPage
-  const currentCompetidores = filteredCompetidores.slice(indexOfFirstCompetidor, indexOfLastCompetidor)
-  const totalPages = Math.ceil(filteredCompetidores.length / competidoresPerPage)
+  const indexOfLastCompetidor = currentPage * competidoresPerPage;
+  const indexOfFirstCompetidor = indexOfLastCompetidor - competidoresPerPage;
+  const currentCompetidores = filteredCompetidores.slice(
+    indexOfFirstCompetidor,
+    indexOfLastCompetidor
+  );
+  const totalPages = Math.ceil(
+    filteredCompetidores.length / competidoresPerPage
+  );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <>
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-neutral-light to-white p-6">
-        {/* Search and Filters Section */}
+        {/* Filtros y búsqueda */}
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
@@ -86,14 +181,14 @@ export const IndexEntrenador = () => {
             </div>
           </div>
 
-          {/* Competitors Grid */}
+          {/* Grid de competidores */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredCompetidores.map((competidor) => (
+            {currentCompetidores.map((competidor) => (
               <CompetidorCard key={competidor.id} competidor={competidor} />
             ))}
           </div>
 
-          {/* Pagination */}
+          {/* Paginación */}
           <div className="flex justify-center mt-6 space-x-2">
             <button
               onClick={() => paginate(currentPage - 1)}
