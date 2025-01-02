@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 
 export const EventoCard = ({ evento }) => {
+  //En curso, Finalizado, Proximo
+  const [estado, setEstado] = useState("");
   const today = new Date().toISOString().split("T")[0];
   const fechaInicio = evento.fecha_inicio
     ? new Date(`${evento.fecha_inicio}T06:00:00Z`)
@@ -10,10 +12,12 @@ export const EventoCard = ({ evento }) => {
     ? new Date(`${evento.fecha_fin}T06:00:00Z`)
     : null;
 
-  const inicio = evento.fecha_inicio
-
-  //En curso, Finalizado, Proximo
-  const [estado, setEstado] = useState("");
+  const colorClase =
+    estado === "En Curso"
+      ? "text-green-500 bg-green-100 p-1 rounded-lg"
+      : estado === "Finalizado"
+      ? "text-red-500 bg-red-100 p-1 rounded-lg"
+      : "text-blue-500 bg-blue-100 p-1 rounded-lg"; // Para "Próximo"
 
   useEffect(() => {
     if (fechaInicio) {
@@ -37,9 +41,6 @@ export const EventoCard = ({ evento }) => {
     } else {
       setEstado("Sin estado"); // Manejo de fechas inválidas o nulas
     }
-
-    console.log(evento.fecha_inicio);
-    console.log(inicio > today);
   }, [fechaInicio, fechaFin, today]);
 
   return (
@@ -84,7 +85,7 @@ export const EventoCard = ({ evento }) => {
             </span>
           </div>
           <div>
-            <span className="text-neutral-dark text-sm">{estado}</span>
+            <span className={`text-neutral-dark text-sm ${colorClase}`}>{estado}</span>
           </div>
           {/* Categories */}
           <div>
