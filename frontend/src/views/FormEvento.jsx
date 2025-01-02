@@ -16,6 +16,18 @@ export const FormEvento = () => {
     archivo: null,
   });
 
+  const today = new Date().toISOString().split("T")[0];
+
+  const handleFechaInicioChange = (e) => {
+    const newFechaInicio = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      fechaInicio: newFechaInicio,
+      // Reset fechaFin if it's before new fechaInicio
+      fechaFin: prev.fechaFin < newFechaInicio ? "" : prev.fechaFin,
+    }));
+  };
+
   useEffect(() => {
     const fetchDisciplinas = async () => {
       try {
@@ -126,16 +138,14 @@ export const FormEvento = () => {
                 />
                 <label htmlFor="isSingleDay">Evento de un día</label>
               </div>
-
               {formData.isSingleDay ? (
                 <input
                   type="date"
                   required
+                  min={today}
                   className="w-full px-3 py-2 border border-neutral/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                   value={formData.fechaInicio}
-                  onChange={(e) =>
-                    setFormData({ ...formData, fechaInicio: e.target.value })
-                  }
+                  onChange={handleFechaInicioChange}
                 />
               ) : (
                 <div className="grid grid-cols-2 gap-4">
@@ -144,14 +154,10 @@ export const FormEvento = () => {
                     <input
                       type="date"
                       required
+                      min={today}
                       className="w-full px-3 py-2 border border-neutral/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                       value={formData.fechaInicio}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          fechaInicio: e.target.value,
-                        })
-                      }
+                      onChange={handleFechaInicioChange}
                     />
                   </div>
                   <div>
@@ -159,6 +165,7 @@ export const FormEvento = () => {
                     <input
                       type="date"
                       required
+                      min={formData.fechaInicio || today}
                       className="w-full px-3 py-2 border border-neutral/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                       value={formData.fechaFin}
                       onChange={(e) =>

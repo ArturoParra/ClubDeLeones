@@ -76,7 +76,7 @@ export const IndexAdmin = () => {
             </div>
 
             <Link to="/FormEvento" className="w-full md:w-96">
-              <button className="bg-green-700 p-2 px-5 rounded-md hover:bg-green-700/90 hover: text-white">
+              <button className="bg-accent p-2 px-5 rounded-md hover:bg-accent/90 hover: text-white">
                 Crear nuevo evento
               </button>
             </Link>

@@ -32,18 +32,18 @@ export const EventoCard = ({ evento }) => {
                 />
               </svg>
               {fechaFin ? (
-                <span className="text-neutral-dark">
+                <span className="text-neutral-dark text-sm">
                   {format(new Date(fechaInicio), "dd/MM/yyyy")} -{" "}
                   {format(new Date(fechaFin), "dd/MM/yyyy")}
                 </span>
               ) : (
-                <span className="text-neutral-dark">
+                <span className="text-neutral-dark text-sm">
                   {format(new Date(fechaInicio), "dd/MM/yyyy")}
                 </span>
               )}
             </div>
             <span className="px-3 py-1 bg-accent/10 text-accent rounded-full text-sm">
-              {evento.tipo}
+              {evento.disciplina}
             </span>
           </div>
           {/* Categories */}
