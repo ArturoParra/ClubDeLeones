@@ -6,6 +6,7 @@ import { LoginEntrenador } from "./views/LoginEntrenador";
 import { SingupEntrenador } from "./views/SingupEntrenador";
 import { IndexEntrenador } from "./views/IndexEntrenador";
 import { IndexAdmin } from "./views/IndexAdmin";
+import { FormEvento } from "./views/FormEvento";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -25,6 +26,7 @@ function App() {
       <Route path="/RegistroEntrenador" element={<SingupEntrenador />} />
       <Route path="/IndexEntrenador" element={<IndexEntrenador />} />
       <Route path="/IndexAdmin" element={<IndexAdmin />} />
+      <Route path="/FormEvento" element={<FormEvento />}/>
     </Routes>
   );
 }

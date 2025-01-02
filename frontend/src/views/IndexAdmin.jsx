@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Header } from "../components/Header";
 import { EventoCard } from "../components/EventoCard";
+import { Link } from "react-router-dom";
 
 export const IndexAdmin = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -200,11 +201,11 @@ export const IndexAdmin = () => {
               />
             </div>
 
-            <div className="w-full md:w-96">
+            <Link to="/FormEvento" className="w-full md:w-96">
               <button className="bg-green-700 p-2 px-5 rounded-md hover:bg-green-700/90 hover: text-white">
                 Crear nuevo evento
               </button>
-            </div>
+            </Link>
 
             {/* Category Filters */}
             <div className="flex flex-wrap gap-4">
@@ -222,7 +223,7 @@ export const IndexAdmin = () => {
             </div>
           </div>
 
-          {/* Grid de competidores */}
+          {/* Grid de eventos */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentEventos.map((event) => (
               <EventoCard key={event.id} event={event} />
