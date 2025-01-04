@@ -9,40 +9,59 @@ export const IndexEntrenador = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const competidoresPerPage = 12;
 
-  useEffect(() => {
-    const fetchCompetidores = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/api/competidores");
-        if (!response.ok) throw new Error("Error al cargar competidores");
-        const data = await response.json();
-        setCompetidores(data);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
-    fetchCompetidores();
-  }, []);
-
+  
   const categorias = ["A", "B", "C", "D", "E"];
-
+  
   const handleCategoryChange = (categoria) => {
     setSelectedCategories((prev) =>
       prev.includes(categoria)
-        ? prev.filter((cat) => cat !== categoria)
+    ? prev.filter((cat) => cat !== categoria)
         : [...prev, categoria]
-    );
+      );
   };
+
+  const calcularCategoria = (fechaNacimiento) => {
+    const hoy = new Date();
+    const fechaNac = new Date(fechaNacimiento);
+    const edad = hoy.getFullYear() - fechaNac.getFullYear();
+    
+    if (edad >= 4 && edad <= 10) return "A";
+      if (edad >= 11 && edad <= 16) return "B";
+      if (edad >= 17 && edad <= 23) return "C";
+      if (edad >= 24 && edad <= 35) return "D";
+      if (edad >= 36) return "E";
+      return "N"; // Para edades menores a 4 años
+  };
+
+  useEffect(() => {
+  const fetchCompetidores = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/competidores");
+      if (!response.ok) throw new Error("Error al cargar competidores");
+      const data = await response.json();
+      // Add categoria to each competitor
+      const competidoresConCategoria = data.map(comp => ({
+        ...comp,
+        categoria: calcularCategoria(comp.fecha_nacimiento)
+      }));
+      setCompetidores(competidoresConCategoria);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  fetchCompetidores();
+}, []);
 
   const filteredCompetidores = competidores.filter((comp) => {
     const matchesSearch = comp.nombre
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase());
     const matchesCategory =
-      selectedCategories.length === 0 ||
-      selectedCategories.includes(comp.categoria);
+    selectedCategories.length === 0 ||
+    selectedCategories.includes(comp.categoria);
     return matchesSearch && matchesCategory;
   });
-
+  
   // Pagination logic
   const indexOfLastCompetidor = currentPage * competidoresPerPage;
   const indexOfFirstCompetidor = indexOfLastCompetidor - competidoresPerPage;
@@ -98,7 +117,7 @@ export const IndexEntrenador = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {currentCompetidores.map((competidor) => (
-                <CompetidorCard key={competidor.id} competidor={competidor} />
+                <CompetidorCard key={competidor.id} competidor={competidor} categoria={calcularCategoria(competidor.fecha_nacimiento)} />
               ))}
             </div>
           )}

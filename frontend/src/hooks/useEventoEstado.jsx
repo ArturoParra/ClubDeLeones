@@ -37,8 +37,6 @@ export const useEventoEstado = (fechaInicio, fechaFin) => {
     } else {
       setEstado("Sin estado"); // Manejo de fechas inválidas o nulas
     }
-    console.log(fechaInicioStr)
-    console.log(formattedToday)
   }, [fechaInicioStr, fechaFinStr, formattedToday]);
 
   const colorClase =

@@ -1,11 +1,9 @@
 import React from "react";
 import { useCategorize } from "../hooks/useCategorize";
 
-export const CompetidorCard = ({competidor}) => {
+export const CompetidorCard = ({competidor, categoria}) => {
 
-  const competidorCategorizado = useCategorize(competidor);
-
-  const { id, nombre, categoria, foto } = competidorCategorizado;
+  const { id, nombre, foto } = competidor;
 
   return (
     <>
@@ -23,7 +21,7 @@ export const CompetidorCard = ({competidor}) => {
             {nombre}
           </h3>
           <span className="inline-block px-3 py-1 mt-2 text-sm rounded-full bg-primary/10 text-primary">
-            {categoria}
+            Categoría {categoria}
           </span>
         </div>
       </div>

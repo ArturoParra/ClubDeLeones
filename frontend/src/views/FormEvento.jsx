@@ -188,7 +188,6 @@ export const FormEvento = () => {
                 value={formData.disciplina}
                 onChange={(e) => {
                   setFormData({ ...formData, disciplina: e.target.value });
-                  console.log(e.target.value);
                 }}
               >
                 <option value="">Selecciona un tipo</option>

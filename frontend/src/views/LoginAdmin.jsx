@@ -79,7 +79,7 @@ export const LoginAdmin = () => {
               <h2 className="text-3xl font-bold text-neutral-dark">
                 Iniciar Sesión
               </h2>
-              <p className="mt-2 text-sm text-neutral">Panel de entrenadores</p>
+              <p className="mt-2 text-sm text-neutral">Panel de administradores</p>
             </div>
           </div>
 

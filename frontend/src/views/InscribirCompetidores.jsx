@@ -14,28 +14,17 @@ export const InscribirCompetidores = () => {
 
     // Mock data - replace with API call
     useEffect(() => {
-        setCompetidores([
-            { id: 1, nombre: "Juan Pérez", categoria: "A" },
-            { id: 2, nombre: "Ana López", categoria: "B" },
-            { id: 3, nombre: "Luis García", categoria: "C" },
-            { id: 4, nombre: "María Fernández", categoria: "D" },
-            { id: 5, nombre: "Pedro Martínez", categoria: "E" },
-            { id: 6, nombre: "Laura Sánchez", categoria: "A" },
-            { id: 7, nombre: "Carlos Gómez", categoria: "B" },
-            { id: 8, nombre: "Lucía Herrera", categoria: "C" },
-            { id: 9, nombre: "Jorge Ramírez", categoria: "D" },
-            { id: 10, nombre: "Elena Jiménez", categoria: "E" },
-            { id: 11, nombre: "Andrés Torres", categoria: "A" },
-            { id: 12, nombre: "Gabriela Morales", categoria: "B" },
-            { id: 13, nombre: "Ricardo Castillo", categoria: "C" },
-            { id: 14, nombre: "Isabel Vargas", categoria: "D" },
-            { id: 15, nombre: "Diego Ortiz", categoria: "E" },
-            { id: 16, nombre: "Paula Cruz", categoria: "A" },
-            { id: 17, nombre: "Sergio Ríos", categoria: "B" },
-            { id: 18, nombre: "Mónica López", categoria: "C" },
-            { id: 19, nombre: "Tomás Navarro", categoria: "D" },
-            { id: 20, nombre: "Adriana Flores", categoria: "E" }
-        ]);
+        const fetchCompetidores = async () => {
+            try {
+              const response = await fetch("http://localhost:5000/api/competidores");
+              if (!response.ok) throw new Error("Error al cargar competidores");
+              const data = await response.json();
+              setCompetidores(data);
+            } catch (error) {
+              console.error("Error:", error);
+            }
+          };
+          fetchCompetidores();
     }, []);
 
     const handleSelect = (competidor) => {
