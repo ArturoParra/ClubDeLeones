@@ -74,10 +74,12 @@ class TiemposGenerales(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
+    categoria = db.Column(db.String(1), nullable=False)
     tiempo = db.Column(db.Float, nullable=False)
 
     evento = db.relationship('Evento', backref='tiempos')
     competidor = db.relationship('Competidor', backref='tiempos')
+
 
     def __repr__(self):
         return f'<TiempoGeneral {self.tiempo}>'
@@ -86,12 +88,14 @@ class TiemposTriatlon(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
+    categoria = db.Column(db.String(1), nullable=False)
     tiempo_natacion = db.Column(db.Float, nullable=False)
     tiempo_ciclismo = db.Column(db.Float, nullable=False)
     tiempo_carrera = db.Column(db.Float, nullable=False)
 
     evento = db.relationship('Evento', backref='tiempos_triatlon')
     competidor = db.relationship('Competidor', backref='tiempos_triatlon')
+
 
     def __repr__(self):
         return f'<TiempoTriatlon {self.tiempo_natacion}, {self.tiempo_ciclismo}, {self.tiempo_carrera}>'
@@ -367,19 +371,21 @@ def inscribir_competidores():
     try:
         data = request.json
         evento_id = data['eventoId']
-        competidores = data['competidores']
+        competidores_data = data['competidores']  # Now expecting array of objects with id and categoria
         evento = Evento.query.get(evento_id)
         
         if not evento:
             return jsonify({'error': 'Evento no encontrado'}), 404
 
-        for competidor_id in competidores:
+        for competidor in competidores_data:
+            competidor_id = competidor['id']
+            categoria = competidor['categoria']
                         
-            # Create time record based on event type
             if evento.disciplina_id == 2:
                 tiempo_triatlon = TiemposTriatlon(
                     id_evento=evento_id,
                     id_competidor=competidor_id,
+                    categoria=categoria,
                     tiempo_natacion=0,
                     tiempo_ciclismo=0,
                     tiempo_carrera=0
@@ -389,6 +395,7 @@ def inscribir_competidores():
                 tiempo_general = TiemposGenerales(
                     id_evento=evento_id,
                     id_competidor=competidor_id,
+                    categoria=categoria,
                     tiempo=0
                 )
                 db.session.add(tiempo_general)

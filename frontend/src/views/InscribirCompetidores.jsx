@@ -77,7 +77,10 @@ export const InscribirCompetidores = () => {
           },
           body: JSON.stringify({
             eventoId: evento.id,
-            competidores: selectedCompetidores.map((comp) => comp.id),
+            competidores: selectedCompetidores.map((comp) => ({
+              id: comp.id,
+              categoria: comp.categoria,
+            })),
           }),
         }
       );
