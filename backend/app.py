@@ -7,7 +7,9 @@ from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 import os
+from pathlib import Path
 import jwt
+from flask import send_from_directory
 
 app = Flask(__name__)
 CORS(app)
@@ -283,6 +285,11 @@ def crear_evento():
         print(f"Error: {str(e)}")  # Debug print
         return jsonify({"error": str(e)}), 500
 
+UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 @app.route('/api/competidores', methods=['POST'])
 def crear_competidor():
     try:
@@ -467,6 +474,10 @@ def get_eventos_competidor(competidor_id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/uploads/<path:filename>')
+def serve_image(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 #! No borrar esto
 if __name__ == '__main__':

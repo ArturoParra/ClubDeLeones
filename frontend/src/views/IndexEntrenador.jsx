@@ -7,6 +7,7 @@ export const IndexEntrenador = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [competidores, setCompetidores] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
   const competidoresPerPage = 12;
 
   const categorias = ["A", "B", "C", "D", "E"];
@@ -34,6 +35,7 @@ export const IndexEntrenador = () => {
 
   useEffect(() => {
     const fetchCompetidores = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch("http://localhost:5000/api/competidores");
         if (!response.ok) throw new Error("Error al cargar competidores");
@@ -47,6 +49,7 @@ export const IndexEntrenador = () => {
       } catch (error) {
         console.error("Error:", error);
       }
+      setIsLoading(false);
     };
     fetchCompetidores();
   }, []);
@@ -121,12 +124,18 @@ export const IndexEntrenador = () => {
           </div>
 
           {/* Grid de competidores */}
-          {competidores.length === 0 ? (
-            <p className="text-center font-bold text-4xl text-neutral-dark">
-              No se pudieron cargar los competidores :{`\(`}
-            </p>
+          {isLoading ? (
+            <div className="flex justify-center items-center min-h-[400px]">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary"></div>
+            </div>
+          ) : competidores.length === 0 ? (
+            <div className="w-full text-center">
+              <p className="font-bold text-4xl text-neutral-dark">
+                No se pudieron cargar los competidores :{`\(`}
+              </p>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
               {currentCompetidores.map((competidor) => (
                 <CompetidorCard
                   key={competidor.id}
