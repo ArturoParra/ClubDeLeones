@@ -67,12 +67,39 @@ class Evento(db.Model):
 
     def __repr__(self):
         return f'<Evento {self.nombre}>'
+    
+class TiemposGenerales(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
+    id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
+    tiempo = db.Column(db.Float, nullable=False)
+
+    evento = db.relationship('Evento', backref='tiempos')
+    competidor = db.relationship('Competidor', backref='tiempos')
+
+    def __repr__(self):
+        return f'<TiempoGeneral {self.tiempo}>'
+    
+class TiemposTriatlon(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
+    id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
+    tiempo_natacion = db.Column(db.Float, nullable=False)
+    tiempo_ciclismo = db.Column(db.Float, nullable=False)
+    tiempo_carrera = db.Column(db.Float, nullable=False)
+
+    evento = db.relationship('Evento', backref='tiempos_triatlon')
+    competidor = db.relationship('Competidor', backref='tiempos_triatlon')
+
+    def __repr__(self):
+        return f'<TiempoTriatlon {self.tiempo_natacion}, {self.tiempo_ciclismo}, {self.tiempo_carrera}>'
 
 # Crear todas las tablas
 with app.app_context():
     db.create_all()
     inspector = inspect(db.engine)
 
+#? Rutas de la API
 
 @app.route('/api', methods=['GET'])
 def home():
@@ -326,6 +353,45 @@ def get_competidores():
         } for c in competidores]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/eventos/inscribir', methods=['POST'])
+def inscribir_competidores():
+    try:
+        data = request.json
+        evento_id = data['eventoId']
+        competidores = data['competidores']
+        evento = Evento.query.get(evento_id)
+        
+        if not evento:
+            return jsonify({'error': 'Evento no encontrado'}), 404
+
+        for competidor_id in competidores:
+                        
+            # Create time record based on event type
+            if evento.disciplina_id == 2:
+                tiempo_triatlon = TiemposTriatlon(
+                    id_evento=evento_id,
+                    id_competidor=competidor_id,
+                    tiempo_natacion=0,
+                    tiempo_ciclismo=0,
+                    tiempo_carrera=0
+                )
+                db.session.add(tiempo_triatlon)
+            else:
+                tiempo_general = TiemposGenerales(
+                    id_evento=evento_id,
+                    id_competidor=competidor_id,
+                    tiempo=0
+                )
+                db.session.add(tiempo_general)
+                
+        db.session.commit()
+        return jsonify({'message': 'Competidores inscritos exitosamente'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 #! No borrar esto
 if __name__ == '__main__':
