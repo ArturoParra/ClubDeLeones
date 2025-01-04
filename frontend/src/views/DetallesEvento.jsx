@@ -9,13 +9,86 @@ export const DetallesEvento = () => {
   const location = useLocation();
   const [evento, setEvento] = useState(location.state.evento);
   const [competidores, setCompetidores] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [fechaInicio, setfechaInicio] = useState(
     location.state.evento.fecha_inicio
   );
   const [fechaFin, setfechaFin] = useState(location.state.evento.fecha_fin);
 
+  const [editingId, setEditingId] = useState(null);
+  const [editValues, setEditValues] = useState({});
+
   const { estado, colorClase, fechaInicioFormateada, fechaFinFormateada } =
     useEventoEstado(fechaInicio, fechaFin);
+
+  // Add edit handlers
+  const handleEditStart = (item) => {
+    setEditingId(item.competidor.id);
+    setEditValues(
+      evento.disciplina === "Triatlón" ? item.tiempos : { tiempo: item.tiempo }
+    );
+  };
+
+  const fetchCompetidores = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/eventos/${evento.id}/competidores`
+      );
+      if (!response.ok) throw new Error("Error al cargar competidores");
+      const data = await response.json();
+      setCompetidores(data);
+    } catch (err) {
+      console.error("Error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    const newValue = value === "" ? "" : parseFloat(value);
+    setEditValues((prev) => ({
+      ...prev,
+      [field]: newValue,
+    }));
+  };
+
+  const validateTimes = () => {
+    if (evento.disciplina === "Triatlón") {
+      return (
+        editValues.natacion !== "" &&
+        editValues.ciclismo !== "" &&
+        editValues.carrera !== ""
+      );
+    }
+    return editValues.tiempo !== "";
+  };
+
+  const handleSave = async (competidorId) => {
+    if (!validateTimes()) {
+      alert("Todos los campos de tiempo son requeridos");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/eventos/${evento.id}/tiempos/${competidorId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(editValues),
+        }
+      );
+
+      if (!response.ok) throw new Error("Error al actualizar tiempos");
+
+      setEditingId(null);
+      // Refresh competitors list
+      fetchCompetidores();
+    } catch (err) {
+      console.error("Error:", err);
+    }
+  };
 
   useEffect(() => {
     evento.fecha_inicio
@@ -28,9 +101,218 @@ export const DetallesEvento = () => {
       : null;
   }, [evento]);
 
+  useEffect(() => {
+    fetchCompetidores();
+  }, [evento.id]);
+
   const InscribirCompetidores = () => {
     navigate(`/InscribirCompetidores/${evento.id}`, { state: { evento } });
-  }
+  };
+
+  const renderTablaCompetidores = () => {
+    if (evento.disciplina === "Triatlón") {
+      return (
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead>
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Competidor
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Categoría
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Entrenador
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                T. Natación
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                T. Ciclismo
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                T. Carrera
+              </th>
+              {estado === "En Curso" && (
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Acciones
+                </th>
+              )}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {competidores.map((item) => (
+              <tr key={item.competidor.id}>
+                <td className="px-6 py-4">{item.competidor.nombre}</td>
+                <td className="px-6 py-4">{item.categoria}</td>
+                <td className="px-6 py-4">{item.entrenador}</td>
+                {editingId === item.competidor.id ? (
+                  <>
+                    <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editValues.natacion ?? ""}
+                        onChange={(e) =>
+                          setEditValues({
+                            ...editValues,
+                            natacion: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-24 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editValues.ciclismo ?? ""}
+                        onChange={(e) =>
+                          setEditValues({
+                            ...editValues,
+                            ciclismo: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-24 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        step="0.01"
+                        value={editValues.carrera ?? ""}
+                        onChange={(e) =>
+                          setEditValues({
+                            ...editValues,
+                            carrera: parseFloat(e.target.value),
+                          })
+                        }
+                        className="w-24 p-1 border rounded"
+                      />
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleSave(item.competidor.id)}
+                        className="text-green-600 hover:text-green-900 mr-2"
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Cancelar
+                      </button>
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td className="px-6 py-4">
+                      {item.tiempos.natacion || "---"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.tiempos.ciclismo || "---"}
+                    </td>
+                    <td className="px-6 py-4">
+                      {item.tiempos.carrera || "---"}
+                    </td>
+                    {estado === "En Curso" && (
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => handleEditStart(item)}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Editar
+                        </button>
+                      </td>
+                    )}
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+    // Regular events table
+    return (
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Competidor
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Categoría
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Entrenador
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Tiempo
+            </th>
+            {estado === "En Curso" && (
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Acciones
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {competidores.map((item) => (
+            <tr key={item.competidor.id}>
+              <td className="px-6 py-4">{item.competidor.nombre}</td>
+              <td className="px-6 py-4">{item.categoria}</td>
+              <td className="px-6 py-4">{item.entrenador}</td>
+              {editingId === item.competidor.id ? (
+                <>
+                  <td className="px-6 py-4">
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editValues.tiempo ?? ""}
+                      onChange={(e) =>
+                        setEditValues({ tiempo: parseFloat(e.target.value) })
+                      }
+                      className="w-24 p-1 border rounded"
+                    />
+                  </td>
+                  <td className="px-6 py-4">
+                    <button
+                      onClick={() => handleSave(item.competidor.id)}
+                      className="text-green-600 hover:text-green-900 mr-2"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="text-red-600 hover:text-red-900"
+                    >
+                      Cancelar
+                    </button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td className="px-6 py-4">{item.tiempo || "---"}</td>
+                  {estado === "En Curso" && (
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleEditStart(item)}
+                        className="text-blue-600 hover:text-blue-900"
+                      >
+                        Editar
+                      </button>
+                    </td>
+                  )}
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
 
   return (
     <>
@@ -131,47 +413,19 @@ export const DetallesEvento = () => {
           </div>
 
           {/* Competitors Table */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-neutral-dark mb-4">
-              Competidores Inscritos
-            </h2>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-neutral/10">
-                <thead>
-                  <tr className="bg-neutral/5">
-                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                      Nombre
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                      Categoría
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-neutral-dark uppercase tracking-wider">
-                      Entrenador
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-neutral/10">
-                  {competidores.map((competidor) => (
-                    <tr key={competidor.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
-                        {competidor.nombre}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
-                        {competidor.categoria}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-neutral-dark">
-                        {competidor.entrenador}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {competidores.length === 0 && (
-                <p className="text-center py-4 text-neutral">
-                  No hay competidores inscritos
-                </p>
-              )}
-            </div>
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-4">Competidores Inscritos</h2>
+            {isLoading ? (
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : competidores.length === 0 ? (
+              <p className="text-center text-gray-500">
+                No hay competidores inscritos
+              </p>
+            ) : (
+              <div className="overflow-x-auto">{renderTablaCompetidores()}</div>
+            )}
           </div>
         </div>
       </div>

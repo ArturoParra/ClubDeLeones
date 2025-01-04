@@ -486,6 +486,106 @@ def get_eventos_competidor(competidor_id):
 def serve_image(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/api/eventos/<int:evento_id>/competidores', methods=['GET'])
+def get_competidores_evento(evento_id):
+    try:
+        evento = Evento.query.get(evento_id)
+        if not evento:
+            return jsonify({'error': 'Evento no encontrado'}), 404
+
+        if evento.disciplina_id == 2:  # Triatlón
+            resultados = db.session.query(
+                Competidor, 
+                TiemposTriatlon, 
+                EntrenadorCompetidor, 
+                Entrenador
+            ).join(
+                TiemposTriatlon, 
+                (Competidor.id == TiemposTriatlon.id_competidor) & 
+                (TiemposTriatlon.id_evento == evento_id)
+            ).outerjoin(
+                EntrenadorCompetidor,
+                Competidor.id == EntrenadorCompetidor.id_competidor
+            ).outerjoin(
+                Entrenador,
+                EntrenadorCompetidor.id_entrenador == Entrenador.id
+            ).all()
+
+            return jsonify([{
+                'competidor': {
+                    'id': comp.id,
+                    'nombre': comp.nombre,
+                },
+                'categoria': tiempo.categoria,
+                'entrenador': entrenador.nombre if entrenador else 'No asignado',
+                'tiempos': {
+                    'natacion': tiempo.tiempo_natacion,
+                    'ciclismo': tiempo.tiempo_ciclismo,
+                    'carrera': tiempo.tiempo_carrera
+                }
+            } for comp, tiempo, entrenador_comp, entrenador in resultados]), 200
+        else:
+            resultados = db.session.query(
+                Competidor, 
+                TiemposGenerales, 
+                EntrenadorCompetidor, 
+                Entrenador
+            ).join(
+                TiemposGenerales,
+                (Competidor.id == TiemposGenerales.id_competidor) & 
+                (TiemposGenerales.id_evento == evento_id)
+            ).outerjoin(
+                EntrenadorCompetidor,
+                Competidor.id == EntrenadorCompetidor.id_competidor
+            ).outerjoin(
+                Entrenador,
+                EntrenadorCompetidor.id_entrenador == Entrenador.id
+            ).all()
+
+            return jsonify([{
+                'competidor': {
+                    'id': comp.id,
+                    'nombre': comp.nombre,
+                },
+                'categoria': tiempo.categoria,
+                'entrenador': entrenador.nombre if entrenador else 'No asignado',
+                'tiempo': tiempo.tiempo
+            } for comp, tiempo, entrenador_comp, entrenador in resultados]), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")  # Debug print
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/eventos/<int:evento_id>/tiempos/<int:competidor_id>', methods=['PUT'])
+def actualizar_tiempos(evento_id, competidor_id):
+    try:
+        data = request.json
+        evento = Evento.query.get(evento_id)
+        
+        if evento.disciplina_id == 2:
+            tiempo = TiemposTriatlon.query.filter_by(
+                id_evento=evento_id, 
+                id_competidor=competidor_id
+            ).first()
+            
+            tiempo.tiempo_natacion = data.get('natacion', tiempo.tiempo_natacion)
+            tiempo.tiempo_ciclismo = data.get('ciclismo', tiempo.tiempo_ciclismo)
+            tiempo.tiempo_carrera = data.get('carrera', tiempo.tiempo_carrera)
+        else:
+            tiempo = TiemposGenerales.query.filter_by(
+                id_evento=evento_id, 
+                id_competidor=competidor_id
+            ).first()
+            
+            tiempo.tiempo = data.get('tiempo', tiempo.tiempo)
+            
+        db.session.commit()
+        return jsonify({'message': 'Tiempos actualizados'}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 #! No borrar esto
 if __name__ == '__main__':
     app.run(debug=True)
