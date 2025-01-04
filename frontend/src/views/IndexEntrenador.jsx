@@ -1,120 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { CompetidorCard } from "../components/CompetidorCard";
 
 export const IndexEntrenador = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [competidores, setCompetidores] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const competidoresPerPage = 12;
 
-  const competidores = [
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 2,
-      nombre: "Ana López",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 3,
-      nombre: "Carlos García",
-      categoria: "Master",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 4,
-      nombre: "Sofía Martínez",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 5,
-      nombre: "Luis Fernández",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 6,
-      nombre: "Elena Torres",
-      categoria: "Master",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 7,
-      nombre: "Diego Hernández",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 8,
-      nombre: "Gabriela Gómez",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 9,
-      nombre: "Marcos Ortiz",
-      categoria: "Master",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 10,
-      nombre: "Laura Castillo",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 11,
-      nombre: "Pedro Ruiz",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 12,
-      nombre: "Camila Mendoza",
-      categoria: "Master",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 13,
-      nombre: "Andrés Rojas",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 14,
-      nombre: "Isabel Chávez",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 15,
-      nombre: "Rodrigo Moreno",
-      categoria: "Master",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 16,
-      nombre: "Mónica Vega",
-      categoria: "Junior",
-      foto: "/placeholder.jpg",
-    },
-    {
-      id: 17,
-      nombre: "Jorge Salinas",
-      categoria: "Senior",
-      foto: "/placeholder.jpg",
-    },
-  ];
-  
+  useEffect(() => {
+    const fetchCompetidores = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/competidores");
+        if (!response.ok) throw new Error("Error al cargar competidores");
+        const data = await response.json();
+        setCompetidores(data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    };
+    fetchCompetidores();
+  }, []);
 
-  const categorias = ["Junior", "Senior", "Master"];
+  const categorias = ["A", "B", "C", "D", "E"];
 
   const handleCategoryChange = (categoria) => {
     setSelectedCategories((prev) =>
@@ -182,11 +91,17 @@ export const IndexEntrenador = () => {
           </div>
 
           {/* Grid de competidores */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {currentCompetidores.map((competidor) => (
-              <CompetidorCard key={competidor.id} competidor={competidor} />
-            ))}
-          </div>
+          {competidores.length === 0 ? (
+            <p className="text-center font-bold text-4xl text-neutral-dark">
+              No se pudieron cargar los competidores :{`\(`}
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {currentCompetidores.map((competidor) => (
+                <CompetidorCard key={competidor.id} competidor={competidor} />
+              ))}
+            </div>
+          )}
 
           {/* Paginación */}
           <div className="flex justify-center mt-6 space-x-2">

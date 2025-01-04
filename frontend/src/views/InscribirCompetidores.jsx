@@ -89,13 +89,24 @@ export const InscribirCompetidores = () => {
                             <div className="overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {filteredCompetidores.map(competidor => (
                                     <div
-                                        key={competidor.id}
-                                        className="p-4 border rounded-lg hover:shadow-md hover:bg-green-300/70 transition-colors duration-500 cursor-pointer"
-                                        onClick={() => handleSelect(competidor)}
-                                    >
-                                        <h3 className="font-semibold">{competidor.nombre}</h3>
-                                        <p className="text-sm text-neutral">{competidor.categoria}</p>
+                                    key={competidor.id}
+                                    className="p-4 border rounded-lg hover:shadow-md hover:bg-green-300/70 transition-colors duration-500 cursor-pointer"
+                                    onClick={() => handleSelect(competidor)}
+                                >
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-100 flex-shrink-0">
+                                            <img
+                                                src={competidor.foto || "/placeholder-user.png"}
+                                                alt={competidor.nombre}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div>
+                                            <h3 className="font-semibold">{competidor.nombre}</h3>
+                                            <p className="text-sm text-neutral">{competidor.categoria}</p>
+                                        </div>
                                     </div>
+                                </div>
                                 ))}
                             </div>
                         </div>

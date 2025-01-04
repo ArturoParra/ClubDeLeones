@@ -9,6 +9,7 @@ import { IndexAdmin } from "./views/IndexAdmin";
 import { FormEvento } from "./views/FormEvento";
 import { DetallesEvento } from "./views/DetallesEvento";
 import { InscribirCompetidores } from "./views/InscribirCompetidores";
+import { RegistroCompetidores } from "./views/RegistroCompetidores";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -31,6 +32,7 @@ function App() {
       <Route path="/FormEvento" element={<FormEvento />}/>
       <Route path="/DetallesEvento/:id" element={<DetallesEvento />}/>
       <Route path="/InscribirCompetidores/:id" element={<InscribirCompetidores />}/>
+      <Route path="/RegistroCompetidor" element={<RegistroCompetidores />} />
     </Routes>
   );
 }

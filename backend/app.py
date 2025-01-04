@@ -33,10 +33,9 @@ class Entrenador(db.Model):
 
 class Competidor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(80), nullable=False)
+    nombre = db.Column(db.String(100), nullable=False)
     fecha_nacimiento = db.Column(db.Date, nullable=False)
-    categoria = db.Column(db.String(1), nullable=False)
-    foto = db.Column(db.LargeBinary)
+    foto_url = db.Column(db.String(200))
 
     def __repr__(self):
         return f'<Competidor {self.nombre}>'
@@ -257,22 +256,74 @@ def crear_evento():
         print(f"Error: {str(e)}")  # Debug print
         return jsonify({"error": str(e)}), 500
 
-@app.route('/api/eventos/<int:id>', methods=['GET'])
-def get_evento(id):
+@app.route('/api/competidores', methods=['POST'])
+def crear_competidor():
     try:
-        evento = Evento.query.get(id)
-        if not evento:
-            return jsonify({"error": "Evento no encontrado"}), 404
-            
+        nombre = request.form.get('nombre')
+        fecha_nacimiento = request.form.get('fechaNacimiento')
+        entrenador_id = request.form.get('entrenadorId')
+        foto = request.files.get('foto')
+        
+        if not all([nombre, fecha_nacimiento, entrenador_id]):
+            return jsonify({"error": "Todos los campos son requeridos"}), 400
+        
+        # Handle photo upload
+        foto_url = None
+        if foto:
+            filename = secure_filename(foto.filename)
+            foto.save(os.path.join('uploads', filename))
+            foto_url = f'/uploads/{filename}'
+        
+        # Create new competitor
+        nuevo_competidor = Competidor(
+            nombre=nombre,
+            fecha_nacimiento=datetime.strptime(fecha_nacimiento, '%Y-%m-%d'),
+            foto_url=foto_url
+        )
+        
+        db.session.add(nuevo_competidor)
+        db.session.flush()  # Get ID before commit
+        
+        # Create relationship
+        entrenador_competidor = EntrenadorCompetidor(
+            id_competidor=nuevo_competidor.id,
+            id_entrenador=entrenador_id
+        )
+        
+        db.session.add(entrenador_competidor)
+        db.session.commit()
+        
         return jsonify({
-            'id': evento.id,
-            'nombre': evento.nombre,
-            'fecha_inicio': evento.fecha_inicio.strftime('%Y-%m-%d'),
-            'fecha_fin': evento.fecha_fin.strftime('%Y-%m-%d') if evento.fecha_fin else None,
-            'disciplina': evento.disciplina.nombre,
-            'categorias': evento.categorias.split(','),
-            'archivo_url': evento.archivo_url
-        }), 200
+            "message": "Competidor registrado exitosamente",
+            "id": nuevo_competidor.id
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error: {str(e)}")  # Debug print
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/entrenadores', methods=['GET'])
+def get_entrenadores():
+    try:
+        entrenadores = Entrenador.query.all()
+        return jsonify([{
+            'id': e.id,
+            'nombre': e.nombre,
+        } for e in entrenadores]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/competidores', methods=['GET'])
+def get_competidores():
+    try:
+        competidores = Competidor.query.all()
+        return jsonify([{
+            'id': c.id,
+            'nombre': c.nombre,
+            'fecha_nacimiento': c.fecha_nacimiento.strftime('%Y-%m-%d'),
+            'foto_url': c.foto_url
+        } for c in competidores]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
