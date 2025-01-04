@@ -1,8 +1,15 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export const CompetidorCard = ({competidor, categoria}) => {
-
+  const navigate = useNavigate();
   const { id, nombre, foto } = competidor;
+
+  const handleVerDetalles = () => {
+    navigate(`/DetallesCompetidor/${id}`, { 
+      state: { competidor: {...competidor, categoria} }
+    });
+  };
 
   return (
     <>
@@ -22,6 +29,14 @@ export const CompetidorCard = ({competidor, categoria}) => {
           <span className="inline-block px-3 py-1 mt-2 text-sm rounded-full bg-primary/10 text-primary">
             Categoría {categoria}
           </span>
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={handleVerDetalles}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Ver Detalles
+            </button>
+          </div>
         </div>
       </div>
     </>

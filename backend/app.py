@@ -393,6 +393,81 @@ def inscribir_competidores():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/competidores/<int:competidor_id>/entrenador', methods=['GET'])
+def get_entrenador_by_competidor(competidor_id):
+    try:
+        # Get the EntrenadorCompetidor relationship
+        relacion = EntrenadorCompetidor.query.filter_by(id_competidor=competidor_id).first()
+        
+        if not relacion:
+            return jsonify({
+                'id': None,
+                'nombre': 'No asignado'
+            }), 200
+
+        # Get the entrenador details
+        entrenador = Entrenador.query.get(relacion.id_entrenador)
+        
+        if not entrenador:
+            return jsonify({
+                'id': None,
+                'nombre': 'No asignado'
+            }), 200
+        
+        return jsonify({
+            'id': entrenador.id,
+            'nombre': entrenador.nombre
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'id': None,
+            'nombre': 'No asignado'
+        }), 200
+    
+@app.route('/api/competidores/<int:competidor_id>/eventos', methods=['GET'])
+def get_eventos_competidor(competidor_id):
+    try:
+        # Get events from TiemposGenerales
+        tiempos_generales = TiemposGenerales.query.filter_by(id_competidor=competidor_id).all()
+        eventos_generales = []
+        for tiempo in tiempos_generales:
+            evento = Evento.query.get(tiempo.id_evento)
+            eventos_generales.append({
+                'id': evento.id,
+                'nombre': evento.nombre,
+                'fecha_inicio': evento.fecha_inicio.strftime('%Y-%m-%d'),
+                'fecha_fin': evento.fecha_fin.strftime('%Y-%m-%d') if evento.fecha_fin else None,
+                'disciplina': evento.disciplina.nombre,
+                'tiempo': tiempo.tiempo,
+                'tipo': 'general'
+            })
+
+        # Get events from TiemposTriatlon
+        tiempos_triatlon = TiemposTriatlon.query.filter_by(id_competidor=competidor_id).all()
+        eventos_triatlon = []
+        for tiempo in tiempos_triatlon:
+            evento = Evento.query.get(tiempo.id_evento)
+            eventos_triatlon.append({
+                'id': evento.id,
+                'nombre': evento.nombre,
+                'fecha_inicio': evento.fecha_inicio.strftime('%Y-%m-%d'),
+                'fecha_fin': evento.fecha_fin.strftime('%Y-%m-%d') if evento.fecha_fin else None,
+                'disciplina': evento.disciplina.nombre,
+                'tiempo_natacion': tiempo.tiempo_natacion,
+                'tiempo_ciclismo': tiempo.tiempo_ciclismo,
+                'tiempo_carrera': tiempo.tiempo_carrera,
+                'tipo': 'triatlon'
+            })
+
+        return jsonify({
+            'eventos_generales': eventos_generales,
+            'eventos_triatlon': eventos_triatlon
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 #! No borrar esto
 if __name__ == '__main__':
     app.run(debug=True)

@@ -95,8 +95,8 @@ export const IndexEntrenador = () => {
             {/* Category Filters */}
             <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg shadow">
               <div className="w-full md:w-auto">
-                <h2 className="text-xl font-bold text-gray-800 mb-4 md:mb-0">
-                  Categorías
+                <h2 className="text-md font-bold text-gray-800 mb-4 md:mb-0">
+                  Filtros por Categorías:
                 </h2>
               </div>
               <div className="flex flex-wrap gap-4">
