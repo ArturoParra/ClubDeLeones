@@ -24,7 +24,7 @@ export const InscribirCompetidores = () => {
               console.error("Error:", error);
             }
           };
-          fetchCompetidores();
+          fetchCompetidores();   
     }, []);
 
     const handleSelect = (competidor) => {

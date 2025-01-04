@@ -82,18 +82,30 @@ export const IndexAdmin = () => {
             </Link>
 
             {/* Category Filters */}
-            <div className="flex flex-wrap gap-4">
-              {categorias.map((categoria) => (
-                <label key={categoria} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedCategories.includes(categoria)}
-                    onChange={() => handleCategoryChange(categoria)}
-                    className="form-checkbox text-primary rounded"
-                  />
-                  <span>{categoria}</span>
-                </label>
-              ))}
+            <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg shadow">
+              <div className="w-full md:w-auto">
+                <h2 className="text-md font-bold text-gray-800 mb-4 md:mb-0">
+                  Filtros por Categorías:
+                </h2>
+              </div>
+              <div className="flex flex-wrap gap-4">
+                {categorias.map((categoria) => (
+                  <label
+                    key={categoria}
+                    className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors cursor-pointer min-w-[120px]"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCategories.includes(categoria)}
+                      onChange={() => handleCategoryChange(categoria)}
+                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 select-none">
+                      {categoria}
+                    </span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
 
