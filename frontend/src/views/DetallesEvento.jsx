@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { format, parseISO } from "date-fns";
 import { Header } from "../components/Header";
 import { useEventoEstado } from "../hooks/useEventoEstado";
 
 export const DetallesEvento = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [evento, setEvento] = useState(location.state.evento);
   const [competidores, setCompetidores] = useState([]);
@@ -26,6 +27,10 @@ export const DetallesEvento = () => {
       ? setfechaFin(parseISO(evento.fecha_fin).toISOString().split("T")[0])
       : null;
   }, [evento]);
+
+  const InscribirCompetidores = () => {
+    navigate(`/InscribirCompetidores/${evento.id}`, { state: { evento } });
+  }
 
   return (
     <>
@@ -111,9 +116,7 @@ export const DetallesEvento = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 bg-white">
             <button
               className="col-span-1 mt-4 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end"
-              onClick={() => {
-                /* Handle inscription */
-              }}
+              onClick={InscribirCompetidores}
             >
               Inscribir Competidor
             </button>
