@@ -1,47 +1,23 @@
 import React, { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns";
+import { Link, useNavigate } from "react-router-dom";
+import { useEventoEstado } from "../hooks/useEventoEstado";
 
 export const EventoCard = ({ evento }) => {
-  //En curso, Finalizado, Proximo
-  const [estado, setEstado] = useState("");
+  const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
-  const fechaInicio = evento.fecha_inicio
-    ? new Date(`${evento.fecha_inicio}T06:00:00Z`)
+  const fechaInicioStr = evento.fecha_inicio
+    ? parseISO(evento.fecha_inicio).toISOString().split("T")[0]
     : null;
-  const fechaFin = evento.fecha_fin
-    ? new Date(`${evento.fecha_fin}T06:00:00Z`)
+  const fechaFinStr = evento.fecha_fin
+    ? parseISO(evento.fecha_fin).toISOString().split("T")[0]
     : null;
 
-  const colorClase =
-    estado === "En Curso"
-      ? "text-green-500 bg-green-100 p-1 rounded-lg"
-      : estado === "Finalizado"
-      ? "text-red-500 bg-red-100 p-1 rounded-lg"
-      : "text-blue-500 bg-blue-100 p-1 rounded-lg"; // Para "Próximo"
+  const {estado, colorClase, fechaInicioFormateada, fechaFinFormateada} = useEventoEstado(fechaInicioStr, fechaFinStr); 
 
-  useEffect(() => {
-    if (fechaInicio) {
-      const fechaInicioStr = fechaInicio.toISOString().split("T")[0];
-
-      if (fechaInicioStr < today) {
-        setEstado("Finalizado");
-        if (fechaFin) {
-          const fechaFinStr = fechaFin.toISOString().split("T")[0];
-          if (fechaFinStr < today) {
-            setEstado("Finalizado");
-          } else {
-            setEstado("En Curso");
-          }
-        }
-      } else if (fechaInicioStr > today) {
-        setEstado("Proximo");
-      } else {
-        setEstado("En Curso");
-      }
-    } else {
-      setEstado("Sin estado"); // Manejo de fechas inválidas o nulas
-    }
-  }, [fechaInicio, fechaFin, today]);
+  const VerDatallesEvento = () => {
+    navigate(`/DetallesEvento/${evento.id}`, { state: { evento } });
+  }
 
   return (
     <>
@@ -69,14 +45,14 @@ export const EventoCard = ({ evento }) => {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {fechaFin ? (
+              {fechaFinStr ? (
                 <span className="text-neutral-dark text-sm">
-                  {format(new Date(fechaInicio), "dd/MM/yyyy")} -{" "}
-                  {format(new Date(fechaFin), "dd/MM/yyyy")}
+                  {fechaInicioFormateada} -{" "}
+                  {fechaFinFormateada}
                 </span>
               ) : (
                 <span className="text-neutral-dark text-sm">
-                  {format(new Date(fechaInicio), "dd/MM/yyyy")}
+                  {fechaInicioFormateada}
                 </span>
               )}
             </div>
@@ -85,7 +61,9 @@ export const EventoCard = ({ evento }) => {
             </span>
           </div>
           <div>
-            <span className={`text-neutral-dark text-sm ${colorClase}`}>{estado}</span>
+            <span className={`text-neutral-dark text-sm ${colorClase}`}>
+              {estado}
+            </span>
           </div>
           {/* Categories */}
           <div>
@@ -105,7 +83,8 @@ export const EventoCard = ({ evento }) => {
           </div>
 
           {/* Action Button */}
-          <button className="w-full mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
+
+          <button onClick={VerDatallesEvento} className="w-full mt-4 bg-primary text-white py-2 rounded-lg hover:bg-primary/90 transition-colors">
             Ver detalles
           </button>
         </div>

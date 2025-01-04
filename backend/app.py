@@ -121,13 +121,11 @@ def signup_entrenador():
 def login_entrenador():
     try:
         data = request.get_json()
-        print("Datos recibidos:", data)  # Debug print 1
         
         email = data.get('email')
         password = data.get('password')
 
         entrenador = Entrenador.query.filter_by(email=email).first()
-        print("Entrenador encontrado:", entrenador)  # Debug print 2
 
         if entrenador and check_password_hash(entrenador.password, password):
             
@@ -257,6 +255,25 @@ def crear_evento():
     except Exception as e:
         db.session.rollback()
         print(f"Error: {str(e)}")  # Debug print
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/eventos/<int:id>', methods=['GET'])
+def get_evento(id):
+    try:
+        evento = Evento.query.get(id)
+        if not evento:
+            return jsonify({"error": "Evento no encontrado"}), 404
+            
+        return jsonify({
+            'id': evento.id,
+            'nombre': evento.nombre,
+            'fecha_inicio': evento.fecha_inicio.strftime('%Y-%m-%d'),
+            'fecha_fin': evento.fecha_fin.strftime('%Y-%m-%d') if evento.fecha_fin else None,
+            'disciplina': evento.disciplina.nombre,
+            'categorias': evento.categorias.split(','),
+            'archivo_url': evento.archivo_url
+        }), 200
+    except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 #! No borrar esto
