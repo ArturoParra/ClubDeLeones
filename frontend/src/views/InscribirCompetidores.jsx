@@ -12,20 +12,37 @@ export const InscribirCompetidores = () => {
 
     const [selectedCategories, setSelectedCategories] = useState(evento.categorias);
 
-    // Mock data - replace with API call
+    const calcularCategoria = (fechaNacimiento) => {
+        const hoy = new Date();
+        const fechaNac = new Date(fechaNacimiento);
+        const edad = hoy.getFullYear() - fechaNac.getFullYear();
+    
+        if (edad >= 4 && edad <= 10) return "A";
+        if (edad >= 11 && edad <= 16) return "B";
+        if (edad >= 17 && edad <= 23) return "C";
+        if (edad >= 24 && edad <= 35) return "D";
+        if (edad >= 36) return "E";
+        return "N"; // Para edades menores a 4 años
+      };
+
     useEffect(() => {
         const fetchCompetidores = async () => {
-            try {
-              const response = await fetch("http://localhost:5000/api/competidores");
-              if (!response.ok) throw new Error("Error al cargar competidores");
-              const data = await response.json();
-              setCompetidores(data);
-            } catch (error) {
-              console.error("Error:", error);
-            }
-          };
-          fetchCompetidores();   
-    }, []);
+          try {
+            const response = await fetch("http://localhost:5000/api/competidores");
+            if (!response.ok) throw new Error("Error al cargar competidores");
+            const data = await response.json();
+            // Add categoria to each competitor
+            const competidoresConCategoria = data.map((comp) => ({
+              ...comp,
+              categoria: calcularCategoria(comp.fecha_nacimiento),
+            }));
+            setCompetidores(competidoresConCategoria);
+          } catch (error) {
+            console.error("Error:", error);
+          }
+        };
+        fetchCompetidores();
+      }, []);
 
     const handleSelect = (competidor) => {
         if (!selectedCompetidores.find(c => c.id === competidor.id)) {
