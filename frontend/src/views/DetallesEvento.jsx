@@ -207,7 +207,7 @@ export const DetallesEvento = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 T. Carrera
               </th>
-              {estado !== "En Curso" && (
+              {estado === "En Curso" && (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
@@ -257,7 +257,7 @@ export const DetallesEvento = () => {
                     <td className="px-6 py-4">
                       {renderTimeDisplay(item.tiempos.carrera)}
                     </td>
-                    {estado !== "En Curso" && (
+                    {estado === "En Curso" && (
                       <td className="px-6 py-4">
                         <button
                           onClick={() => handleEditStart(item)}
@@ -293,7 +293,7 @@ export const DetallesEvento = () => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tiempo
             </th>
-            {estado !== "En Curso" && (
+            {estado === "En Curso" && (
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
@@ -331,7 +331,7 @@ export const DetallesEvento = () => {
                   <td className="px-6 py-4">
                     {renderTimeDisplay(item.tiempo)}
                   </td>
-                  {estado !== "En Curso" && (
+                  {estado === "En Curso" && (
                     <td className="px-6 py-4">
                       <button
                         onClick={() => handleEditStart(item)}

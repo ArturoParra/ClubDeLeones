@@ -24,7 +24,7 @@ export const EventoCard = ({ evento }) => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
         {/* Event Header */}
         <div className="bg-primary p-4">
-          <h3 className="text-xl font-bold text-white">{evento.nombre}</h3>
+          <h3 className="text-md font-bold text-white">{evento.nombre}</h3>
         </div>
 
         {/* Event Content */}

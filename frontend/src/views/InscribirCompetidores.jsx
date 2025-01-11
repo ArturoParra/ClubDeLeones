@@ -149,7 +149,7 @@ export const InscribirCompetidores = () => {
                     <div className="flex items-center space-x-4">
                       <div className="w-16 h-16 rounded-full overflow-hidden bg-neutral-100 flex-shrink-0">
                         <img
-                          src={competidor.foto || defaultAvatar}
+                          src={competidor.foto_url ? `http://localhost:5000/${competidor.foto_url}` : defaultAvatar}
                           alt={competidor.nombre}
                           className="w-full h-full object-cover"
                         />

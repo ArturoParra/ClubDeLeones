@@ -9,7 +9,7 @@ export const IndexAdmin = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [eventos, setEventos] = useState([]);
   const [Ceventos, setCeventos] = useState([])
-  const eventosPerPage = 12;
+  const eventosPerPage = 8;
 
   useEffect(() => {
     const fecthEventos = async () => {
