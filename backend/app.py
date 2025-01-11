@@ -582,6 +582,28 @@ def actualizar_tiempos(evento_id, competidor_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/competidores/<int:id>', methods=['GET'])
+def get_competidor(id):
+    try:
+        competidor = Competidor.query.get(id)
+        if not competidor:
+            return jsonify({'error': 'Competidor no encontrado'}), 404
+
+        entrenador_relacion = EntrenadorCompetidor.query.filter_by(id_competidor=id).first()
+        entrenador = Entrenador.query.get(entrenador_relacion.id_entrenador) if entrenador_relacion else None
+
+        return jsonify({
+            'id': competidor.id,
+            'nombre': competidor.nombre,
+            'fecha_nacimiento': competidor.fecha_nacimiento.strftime('%Y-%m-%d'),
+            'foto_url': competidor.foto_url,
+            'entrenador_id': entrenador.id if entrenador else None,
+            'entrenador_nombre': entrenador.nombre if entrenador else 'No asignado'
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 #! No borrar esto
 if __name__ == '__main__':

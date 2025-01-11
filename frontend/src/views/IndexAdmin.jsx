@@ -61,6 +61,19 @@ export const IndexAdmin = () => {
     <>
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-neutral-light to-white p-6">
+        <div className="flex flex-col items-center justify-center space-y-6 mb-2">
+          <Link to="/FormEvento" className="w-full max-w-xs md:max-w-md">
+            <button className="bg-accent p-2 px-5 w-full rounded-md hover:bg-accent/90 text-white">
+              Crear nuevo evento
+            </button>
+          </Link>
+
+          <Link to="/AdminConsultaCompetidores" className="w-full max-w-xs md:max-w-md">
+            <button className="bg-accent p-2 px-5 w-full rounded-md hover:bg-accent/90 text-white">
+              Consultar Competidores
+            </button>
+          </Link>
+        </div>
         {/* Filtros y búsqueda */}
         <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -74,12 +87,6 @@ export const IndexAdmin = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            <Link to="/FormEvento" className="w-full md:w-96">
-              <button className="bg-accent p-2 px-5 rounded-md hover:bg-accent/90 hover: text-white">
-                Crear nuevo evento
-              </button>
-            </Link>
 
             {/* Category Filters */}
             <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg shadow">

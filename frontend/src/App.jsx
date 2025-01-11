@@ -11,6 +11,8 @@ import { DetallesEvento } from "./views/DetallesEvento";
 import { InscribirCompetidores } from "./views/InscribirCompetidores";
 import { RegistroCompetidores } from "./views/RegistroCompetidores";
 import DetallesCompetidor from "./views/DetallesCompetidor";
+import { AdminConsultaCompetidores } from "./views/AdminConsultaCompetidores";
+import { EditarCompetidor } from "./views/EditarCompetidor";
 
 function App() {
   const [message, setMessage] = useState("");
@@ -35,6 +37,8 @@ function App() {
       <Route path="/InscribirCompetidores/:id" element={<InscribirCompetidores />}/>
       <Route path="/RegistroCompetidor" element={<RegistroCompetidores />} />
       <Route path="/DetallesCompetidor/:id" element={<DetallesCompetidor />} />
+      <Route path="/AdminConsultaCompetidores" element={<AdminConsultaCompetidores />} />
+      <Route path="/EditarCompetidor/:id" element={<EditarCompetidor />} />
     </Routes>
   );
 }
