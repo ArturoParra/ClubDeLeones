@@ -8,6 +8,7 @@ export const IndexAdmin = () => {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [eventos, setEventos] = useState([]);
+  const [Ceventos, setCeventos] = useState([])
   const eventosPerPage = 12;
 
   useEffect(() => {
@@ -55,7 +56,15 @@ export const IndexAdmin = () => {
   );
   const totalPages = Math.ceil(filteredEventos.length / eventosPerPage);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    setCurrentPage(1);
+    console.log("buscando texto")
+  }, [searchTerm, selectedCategories]);  
 
   return (
     <>
@@ -117,11 +126,21 @@ export const IndexAdmin = () => {
           </div>
 
           {/* Grid de eventos */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {currentEventos.map((evento) => (
-              <EventoCard key={evento.id} evento={evento} />
-            ))}
-          </div>
+          {
+            currentEventos.length === 0 ? (
+              <div className="w-full text-center">
+                <h2 className="text-xl font-bold text-neutral-dark">
+                  No se encontraron eventos
+                </h2>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {currentEventos.map((evento) => (
+                  <EventoCard key={evento.id} evento={evento} />
+                ))}
+              </div>
+            )
+          }
 
           {/* Paginación */}
           <div className="flex justify-center mt-6 space-x-2">

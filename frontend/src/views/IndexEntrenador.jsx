@@ -75,7 +75,15 @@ export const IndexEntrenador = () => {
     filteredCompetidores.length / competidoresPerPage
   );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+      setCurrentPage(1);
+      console.log("buscando texto")
+    }, [searchTerm, selectedCategories]);
 
   return (
     <>
@@ -132,6 +140,12 @@ export const IndexEntrenador = () => {
             <div className="w-full text-center">
               <p className="font-bold text-4xl text-neutral-dark">
                 No se pudieron cargar los competidores :{`\(`}
+              </p>
+            </div>
+          ) : currentCompetidores.length === 0 ? (
+            <div className="w-full text-center">
+              <p className="font-bold text-4xl text-neutral-dark">
+                No se encontraron coincidencias :{`\(`}
               </p>
             </div>
           ) : (
