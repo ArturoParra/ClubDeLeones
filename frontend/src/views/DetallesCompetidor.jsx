@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Header } from "../components/Header";
+import { format, parseISO, set } from "date-fns";
 
 const DetallesCompetidor = () => {
   const location = useLocation();
@@ -9,8 +10,11 @@ const DetallesCompetidor = () => {
   const [entrenador, setEntrenador] = useState(null);
   const [eventosGenerales, setEventosGenerales] = useState([]);
   const [eventosTriatlon, setEventosTriatlon] = useState([]);
+  const [eventosGFormated, seteventosGFormated] = useState([])
+  const [eventosTFormated, seteventosTFormated] = useState([])
+  const [Fecha_nacComp, setFecha_nacComp] = useState('')
 
-  const { foto_url } = competidor;
+  const { foto_url, fecha_nacimiento } = competidor;
 
   const defaultAvatar =
     "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
@@ -56,6 +60,56 @@ const DetallesCompetidor = () => {
     fetchEntrenador();
   }, [competidor.id]);
 
+  const formatFecha = (fecha) => {
+    return fecha ? format(parseISO(fecha), "dd/MM/yyyy") : null;
+  };
+
+  useEffect(() => {
+
+    const CompetidoresFormated = eventosGenerales.map((evento) => {
+      const fechaInicioStr = evento.fecha_inicio
+        ? parseISO(evento.fecha_inicio).toISOString().split("T")[0]
+        : null;
+      const fechaFinStr = evento.fecha_fin
+        ? parseISO(evento.fecha_fin).toISOString().split("T")[0]
+        : null;
+      return {
+        ...evento,
+        fecha_inicio: formatFecha(fechaInicioStr),
+        fecha_fin: formatFecha(fechaFinStr),
+      };
+    });
+    seteventosGFormated(CompetidoresFormated);
+  }, [eventosGenerales]);
+
+  useEffect(() => {
+
+    const CompetidoresFormated = eventosTriatlon.map((evento) => {
+      const fechaInicioStr = evento.fecha_inicio
+        ? parseISO(evento.fecha_inicio).toISOString().split("T")[0]
+        : null;
+      const fechaFinStr = evento.fecha_fin
+        ? parseISO(evento.fecha_fin).toISOString().split("T")[0]
+        : null;
+      return {
+        ...evento,
+        fecha_inicio: formatFecha(fechaInicioStr),
+        fecha_fin: formatFecha(fechaFinStr),
+      };
+    });
+    seteventosTFormated(CompetidoresFormated);
+    
+  }, [eventosTriatlon])
+
+  useEffect(() => {
+    const fechaStr = fecha_nacimiento
+    ? parseISO(fecha_nacimiento).toISOString().split("T")[0]
+    : null;
+    setFecha_nacComp(format(parseISO(fechaStr), "dd/MM/yyyy"))
+  }, [fecha_nacimiento])
+  
+  
+
   // ...existing code...
   return (
     <>
@@ -79,9 +133,7 @@ const DetallesCompetidor = () => {
                   <div>
                     <p className="text-gray-600">Fecha de Nacimiento:</p>
                     <p className="font-semibold">
-                      {new Date(
-                        competidor.fecha_nacimiento
-                      ).toLocaleDateString()}
+                      {Fecha_nacComp}
                     </p>
                   </div>
                   <div>
@@ -108,7 +160,7 @@ const DetallesCompetidor = () => {
                 Este competidor no ha participado en eventos generales
               </p>
             ) : (
-              eventosGenerales.map((evento) => (
+              eventosGFormated.map((evento) => (
                 <div
                   key={`general-${evento.id}`}
                   className="bg-white rounded-xl shadow-lg p-6"
@@ -136,7 +188,7 @@ const DetallesCompetidor = () => {
                 Este competidor no ha participado en triatlones
               </p>
             ) : (
-              eventosTriatlon.map((evento) => (
+              eventosTFormated.map((evento) => (
                 <div
                   key={`triatlon-${evento.id}`}
                   className="bg-white rounded-xl shadow-lg p-6"
