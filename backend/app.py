@@ -662,6 +662,27 @@ def delete_competidor(id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/eventos/<int:id>', methods=['DELETE'])
+def delete_evento(id):
+    try:
+        evento = Evento.query.get(id)
+        if not evento:
+            return jsonify({'error': 'Evento no encontrado'}), 404
+
+        # Eliminar tiempos asociados
+        TiemposGenerales.query.filter_by(id_evento=id).delete()
+        TiemposTriatlon.query.filter_by(id_evento=id).delete()
+
+        # Eliminar evento
+        db.session.delete(evento)
+        db.session.commit()
+        
+        return jsonify({'message': 'Evento borrado exitosamente'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 #! No borrar esto
 if __name__ == '__main__':

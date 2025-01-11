@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { CompetidorCardAdmin } from "../components/CompetidorCardAdmin";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 export const AdminConsultaCompetidores = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [competidores, setCompetidores] = useState([]);
@@ -128,7 +130,12 @@ export const AdminConsultaCompetidores = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
+            <button
+              onClick={() => navigate("/RegistroCompetidor")}
+              className="bg-accent text-white px-4 py-2 rounded-lg hover:bg-accent/90"
+            >
+              Registrar Nuevo Competidor
+            </button>
             {/* Category Filters */}
             <div className="flex flex-col md:flex-row gap-4 p-4 bg-white rounded-lg shadow">
               <div className="w-full md:w-auto">

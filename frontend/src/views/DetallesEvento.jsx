@@ -350,6 +350,61 @@ export const DetallesEvento = () => {
     );
   };
 
+  const handleDelete = async () => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Una vez borrado, no podrás recuperar este evento.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, borrar",
+      cancelButtonText: "No, cancelar",
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mx-2",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600",
+      },
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/eventos/${evento.id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (!response.ok) throw new Error("Error al borrar el evento");
+        Swal.fire({
+          title: "¡Evento borrado exitosamente!",
+          icon: "success",
+          buttonsStyling: false,
+          customClass: {
+            confirmButton:
+              "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600",
+          },
+        });
+        navigate("/IndexAdmin");
+      } catch (err) {
+        console.error("Error:", err);
+        Swal.fire({
+          title: "Error",
+          text: "Error al borrar el evento",
+          icon: "error",
+          confirmButtonText: "Aceptar",
+          buttonsStyling: false,
+          customClass: {
+            confirmButton:
+              "bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600",
+          },
+        });
+      }
+    } else {
+      Swal.fire("El evento no fue borrado");
+    }
+  };
+
   return (
     <>
       <Header />
@@ -482,6 +537,12 @@ export const DetallesEvento = () => {
               <div className="overflow-x-auto">{renderTablaCompetidores()}</div>
             )}
           </div>
+        <button
+          onClick={handleDelete}
+          className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600"
+        >
+          Borrar Evento
+        </button>
         </div>
       </div>
     </>
