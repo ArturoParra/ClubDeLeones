@@ -255,18 +255,16 @@ def consultar_eventos():
 @app.route('/api/eventos', methods=['POST'])
 def crear_evento():
     try:
-        
         data = request.form
         
-        
-        categorias = request.form.getlist('categorias[]')
+        categorias = data.get('categorias')
         
         nuevo_evento = Evento(
             nombre=data['nombre'],
             fecha_inicio=datetime.strptime(data['fechaInicio'], '%Y-%m-%d'),
             fecha_fin=datetime.strptime(data['fechaFin'], '%Y-%m-%d') if data.get('fechaFin') else None,
             disciplina_id=int(data['disciplina_id']),
-            categorias=categorias
+            categorias=categorias  # Ensure categorias is set correctly
         )
         
         db.session.add(nuevo_evento)

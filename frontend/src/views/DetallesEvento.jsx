@@ -207,7 +207,7 @@ export const DetallesEvento = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 T. Carrera
               </th>
-              {estado /*descomentar  !== "En Curso" */ && (
+              {estado !== "En Curso" && (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
@@ -479,21 +479,13 @@ export const DetallesEvento = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 bg-white">
+          <div className="grid grid-cols-1 bg-white">
             <button
-              /* descomentar               disabled={estado !== "Próximo"}
-               */ className="col-span-1 mt-4 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end disabled:opacity-50"
+              disabled={estado !== "Próximo"}
+              className="col-span-1 mt-4 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end disabled:opacity-50"
               onClick={InscribirCompetidores}
             >
               Inscribir Competidor
-            </button>
-            <button
-              className="col-span-1 mt-4 mx-3 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end"
-              onClick={() => {
-                /* Handle inscription */
-              }}
-            >
-              Generar Reporte de Resultados
             </button>
           </div>
 

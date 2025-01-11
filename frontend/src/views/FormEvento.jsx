@@ -60,10 +60,8 @@ export const FormEvento = () => {
         formDataToSend.append("fechaFin", formData.fechaFin);
       }
 
-      // Append categories as array
-      formData.categorias.forEach((cat) => {
-        formDataToSend.append("categorias[]", cat);
-      });
+      // Append categories as a comma-separated string
+      formDataToSend.append("categorias", formData.categorias.join(","));
 
       const response = await fetch("http://localhost:5000/api/eventos", {
         method: "POST",
@@ -90,7 +88,16 @@ export const FormEvento = () => {
       }, 1000);
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message);
+      Swal.fire({
+        title: "Error",
+        text: error.message,
+        icon: "error",
+        confirmButtonText: "Aceptar",
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600'
+        }
+      });
     }
   };
 
