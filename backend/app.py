@@ -604,6 +604,64 @@ def get_competidor(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/competidores/<int:id>', methods=['PUT'])
+def update_competidor(id):
+    try:
+        data = request.form
+        competidor = Competidor.query.get(id)
+        if not competidor:
+            return jsonify({'error': 'Competidor no encontrado'}), 404
+
+        competidor.nombre = data.get('nombre', competidor.nombre)
+        competidor.fecha_nacimiento = datetime.strptime(data.get('fechaNacimiento', competidor.fecha_nacimiento.strftime('%Y-%m-%d')), '%Y-%m-%d')
+
+        if 'foto' in request.files:
+            foto = request.files['foto']
+            filename = secure_filename(foto.filename)
+            filepath = Path('uploads') / filename
+            foto.save(filepath)
+            competidor.foto_url = str(filepath)
+
+        entrenador_id = data.get('entrenadorId')
+        if entrenador_id:
+            entrenador_relacion = EntrenadorCompetidor.query.filter_by(id_competidor=id).first()
+            if entrenador_relacion:
+                entrenador_relacion.id_entrenador = entrenador_id
+            else:
+                nuevo_entrenador_relacion = EntrenadorCompetidor(id_competidor=id, id_entrenador=entrenador_id)
+                db.session.add(nuevo_entrenador_relacion)
+
+        db.session.commit()
+        return jsonify({'message': 'Competidor actualizado exitosamente'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/competidores/<int:id>', methods=['DELETE'])
+def delete_competidor(id):
+    try:
+        competidor = Competidor.query.get(id)
+        if not competidor:
+            return jsonify({'error': 'Competidor no encontrado'}), 404
+
+        # Eliminar relaciones con entrenadores
+        EntrenadorCompetidor.query.filter_by(id_competidor=id).delete()
+
+        # Eliminar tiempos asociados
+        TiemposGenerales.query.filter_by(id_competidor=id).delete()
+        TiemposTriatlon.query.filter_by(id_competidor=id).delete()
+
+        # Eliminar competidor
+        db.session.delete(competidor)
+        db.session.commit()
+        
+        return jsonify({'message': 'Competidor borrado exitosamente'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 #! No borrar esto
 if __name__ == '__main__':

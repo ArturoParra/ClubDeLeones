@@ -24,7 +24,7 @@ export const EditarCompetidor = () => {
         const data = await response.json();
         setFormData({
           nombre: data.nombre,
-          fechaNacimiento: data.fecha_nacimiento,
+          fechaNacimiento: data.fecha_nacimiento.split("T")[0], // Asegúrate de que la fecha esté en el formato correcto
           foto: null,
           entrenadorId: data.entrenador_id,
         });
