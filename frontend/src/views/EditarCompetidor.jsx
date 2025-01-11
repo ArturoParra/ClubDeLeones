@@ -20,7 +20,9 @@ export const EditarCompetidor = () => {
   useEffect(() => {
     const fetchCompetidor = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/competidores/${id}`);
+        const response = await fetch(
+          `http://localhost:5000/api/competidores/${id}`
+        );
         if (!response.ok) throw new Error("Error al cargar competidor");
         const data = await response.json();
         setFormData({
@@ -29,7 +31,13 @@ export const EditarCompetidor = () => {
           foto: null,
           entrenadorId: data.entrenador_id,
         });
-        setPreviewUrl(data.foto_url);
+        const defaultAvatar =
+          "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23cccccc'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z'/%3E%3C/svg%3E";
+
+        const imageUrl = data.foto_url
+          ? `http://localhost:5000/${data.foto_url}`
+          : defaultAvatar;
+        setPreviewUrl(imageUrl);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -88,10 +96,13 @@ export const EditarCompetidor = () => {
         formDataToSend.append("foto", formData.foto);
       }
 
-      const response = await fetch(`http://localhost:5000/api/competidores/${id}`, {
-        method: "PUT",
-        body: formDataToSend,
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/competidores/${id}`,
+        {
+          method: "PUT",
+          body: formDataToSend,
+        }
+      );
 
       const data = await response.json();
 
@@ -106,8 +117,9 @@ export const EditarCompetidor = () => {
         confirmButtonText: "Aceptar",
         buttonsStyling: false,
         customClass: {
-          confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
-        }
+          confirmButton:
+            "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600",
+        },
       });
       navigate(-1);
     } catch (err) {
