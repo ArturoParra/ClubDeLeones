@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { Header } from '../components/Header'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 
 export const SingupEntrenador = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -39,6 +41,19 @@ export const SingupEntrenador = () => {
       if (!response.ok) {
         throw new Error(data.message || 'Error en el registro');
       }
+
+      Swal.fire({
+        title: 'Éxito',
+        text: 'Registro exitoso',
+        icon: 'success',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
+        }
+      });
+
+      navigate('/');
       
     } catch (err) {
       setError(err.message);
