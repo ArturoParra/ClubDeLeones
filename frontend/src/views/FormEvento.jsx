@@ -14,7 +14,6 @@ export const FormEvento = () => {
     fechaFin: "",
     disciplina: "",
     categorias: [],
-    archivo: null,
   });
 
   const today = new Date().toISOString().split("T")[0];
@@ -65,10 +64,6 @@ export const FormEvento = () => {
       formData.categorias.forEach((cat) => {
         formDataToSend.append("categorias[]", cat);
       });
-
-      if (formData.archivo) {
-        formDataToSend.append("archivo", formData.archivo);
-      }
 
       const response = await fetch("http://localhost:5000/api/eventos", {
         method: "POST",
@@ -230,21 +225,6 @@ export const FormEvento = () => {
                   </label>
                 ))}
               </div>
-            </div>
-
-            {/* Archivo */}
-            <div>
-              <label className="block text-sm font-medium text-neutral-dark mb-1">
-                Documentación (PDF)
-              </label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                  setFormData({ ...formData, archivo: e.target.files[0] })
-                }
-                className="w-full px-3 py-2 border border-neutral/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
             </div>
 
             {/* Botón */}

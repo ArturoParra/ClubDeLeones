@@ -63,7 +63,6 @@ class Evento(db.Model):
     fecha_fin = db.Column(db.Date)
     disciplina_id = db.Column(db.Integer, db.ForeignKey('disciplina.id'), nullable=False)
     categorias = db.Column(db.String(100), nullable=False)
-    archivo_url = db.Column(db.String(200))
     
     disciplina = db.relationship('Disciplina', backref='eventos')
 
@@ -249,7 +248,6 @@ def consultar_eventos():
             'fecha_fin': e.fecha_fin.strftime('%Y-%m-%d') if e.fecha_fin else None,
             'disciplina': e.disciplina.nombre,
             'categorias': e.categorias.split(','),
-            'archivo_url': e.archivo_url
         } for e in eventos]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -257,18 +255,10 @@ def consultar_eventos():
 @app.route('/api/eventos', methods=['POST'])
 def crear_evento():
     try:
-        # Get JSON data for regular fields
+        
         data = request.form
-        archivo = request.files.get('archivo')
         
-        # Handle file upload
-        archivo_url = None
-        if archivo:
-            filename = secure_filename(archivo.filename)
-            archivo.save(os.path.join('uploads', filename))
-            archivo_url = f'/uploads/{filename}'
         
-        # Get categories as list from form
         categorias = request.form.getlist('categorias[]')
         
         nuevo_evento = Evento(
@@ -276,19 +266,18 @@ def crear_evento():
             fecha_inicio=datetime.strptime(data['fechaInicio'], '%Y-%m-%d'),
             fecha_fin=datetime.strptime(data['fechaFin'], '%Y-%m-%d') if data.get('fechaFin') else None,
             disciplina_id=int(data['disciplina_id']),
-            categorias=','.join(categorias) if categorias else '',
-            archivo_url=archivo_url
+            categorias=categorias
         )
         
         db.session.add(nuevo_evento)
         db.session.commit()
         
-        return jsonify({"message": "Evento creado exitosamente"}), 201
-        
+        return jsonify({'message': 'Evento creado exitosamente'}), 201
+
     except Exception as e:
         db.session.rollback()
-        print(f"Error: {str(e)}")  # Debug print
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+    
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
 if not os.path.exists(UPLOAD_FOLDER):

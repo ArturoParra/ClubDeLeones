@@ -476,31 +476,6 @@ export const DetallesEvento = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col justify-between">
-                {evento?.archivo_url && (
-                  <a
-                    href={evento.archivo_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center text-primary hover:text-primary/80"
-                  >
-                    <svg
-                      className="w-5 h-5 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-                      />
-                    </svg>
-                    Ver documento
-                  </a>
-                )}
-              </div>
             </div>
           </div>
 
