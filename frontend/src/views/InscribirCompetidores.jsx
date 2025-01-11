@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Header } from "../components/Header";
 import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const InscribirCompetidores = () => {
   const location = useLocation();
@@ -90,7 +91,16 @@ export const InscribirCompetidores = () => {
       }
 
       // Show success message
-      alert("Competidores inscritos exitosamente");
+      Swal.fire({
+        title: "Éxito",
+        text: "Competidores inscritos exitosamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
+        }
+      });
       // Redirect or update UI
       navigate(-1);
     } catch (error) {

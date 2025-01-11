@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const RegistroCompetidores = () => {
   const navigate = useNavigate();
@@ -78,7 +79,16 @@ export const RegistroCompetidores = () => {
         throw new Error(data.error || "Error al registrar competidor");
       }
 
-      alert("Competidor registrado exitosamente");
+      Swal.fire({
+        title: "Éxito",
+        text: "Competidor registrado exitosamente",
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
+        }
+      });
       navigate(-1);
     } catch (err) {
       setError(err.message);

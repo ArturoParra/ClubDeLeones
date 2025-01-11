@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { CompetidorCardAdmin } from "../components/CompetidorCardAdmin";
+import Swal from "sweetalert2";
 
 export const AdminConsultaCompetidores = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,60 +35,88 @@ export const AdminConsultaCompetidores = () => {
   };
 
   const handleDelete = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/competidores/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Error al borrar el competidor");
-      setCompetidores(competidores.filter((competidor) => competidor.id !== id));
-    } catch (err) {
-      console.error("Error:", err);
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Una vez borrado, no podrás recuperar este competidor.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, borrar",
+      cancelButtonText: "No, cancelar",
+      buttonsStyling: false,
+      customClass: {
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 mx-2",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600",
+      },
+    });
+
+    if (result.isConfirmed) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/competidores/${id}`,
+          {
+            method: "DELETE",
+          }
+        );
+        if (!response.ok) throw new Error("Error al borrar el competidor");
+        setCompetidores(
+          competidores.filter((competidor) => competidor.id !== id)
+        );
+        Swal.fire("¡Competidor borrado exitosamente!", {
+          icon: "success",
+          buttonsStyling: false,
+          customClass: {
+            confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
+          }
+        });
+      } catch (err) {
+        console.error("Error:", err);
+        Swal.fire("Error al borrar el competidor", {
+          icon: "error",
+        });
+      }
+    } else {
+      Swal.fire("El competidor no fue borrado");
     }
   };
 
-  const handleEdit = (id) => {
-    // Implementar lógica para habilitar la edición de los datos del competidor
-    console.log("Editar competidor con id:", id);
-  };
-
   useEffect(() => {
-      const fetchCompetidores = async () => {
-        setIsLoading(true);
-        try {
-          const response = await fetch("http://localhost:5000/api/competidores");
-          if (!response.ok) throw new Error("Error al cargar competidores");
-          const data = await response.json();
-          // Add categoria to each competitor
-          const competidoresConCategoria = data.map((comp) => ({
-            ...comp,
-            categoria: calcularCategoria(comp.fecha_nacimiento),
-          }));
-          setCompetidores(competidoresConCategoria);
-        } catch (error) {
-          console.error("Error:", error);
-        }
-        setIsLoading(false);
-      };
-      fetchCompetidores();
-    }, []);
+    const fetchCompetidores = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch("http://localhost:5000/api/competidores");
+        if (!response.ok) throw new Error("Error al cargar competidores");
+        const data = await response.json();
+        // Add categoria to each competitor
+        const competidoresConCategoria = data.map((comp) => ({
+          ...comp,
+          categoria: calcularCategoria(comp.fecha_nacimiento),
+        }));
+        setCompetidores(competidoresConCategoria);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+      setIsLoading(false);
+    };
+    fetchCompetidores();
+  }, []);
 
-    const filteredCompetidores = competidores.filter((comp) => {
-        const matchesSearch = comp.nombre
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-        const matchesCategory =
-          selectedCategories.length === 0 ||
-          selectedCategories.includes(comp.categoria);
-        return matchesSearch && matchesCategory;
-      });
+  const filteredCompetidores = competidores.filter((comp) => {
+    const matchesSearch = comp.nombre
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(comp.categoria);
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <>
       <Header />
       <div className="min-h-screen bg-gradient-to-b from-neutral-light to-white p-6">
         <div className="max-w-7xl mx-auto space-y-8">
-            {/* Filtros y búsqueda */}
-        <div className="max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="w-full md:w-96">
@@ -127,25 +156,29 @@ export const AdminConsultaCompetidores = () => {
               </div>
             </div>
           </div>
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              Consultar Competidores
+            </h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {isLoading ? (
                 <p className="text-gray-600">Cargando...</p>
               ) : competidores.length === 0 ? (
-                <p className="text-gray-600">No se han registrado competidores</p>
+                <p className="text-gray-600">
+                  No se han registrado competidores
+                </p>
               ) : (
                 filteredCompetidores.map((competidor) => (
                   <CompetidorCardAdmin
                     key={competidor.id}
                     competidor={competidor}
                     onDelete={handleDelete}
-                    onEdit={handleEdit}
                   />
                 ))
               )}
             </div>
-          
+          </div>
         </div>
-      </div>
       </div>
     </>
   );

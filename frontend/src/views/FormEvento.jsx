@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Header } from "../components/Header";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const FormEvento = () => {
   const navigate = useNavigate();
@@ -78,7 +79,16 @@ export const FormEvento = () => {
       if (!response.ok)
         throw new Error(data.error || "Error al crear el evento");
 
-      alert(data.message);
+      Swal.fire({
+        title: "Éxito",
+        text: data.message,
+        icon: "success",
+        confirmButtonText: "Aceptar",
+        buttonsStyling: false,
+        customClass: {
+          confirmButton: 'bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600'
+        }
+      });
 
       setTimeout(() => {
         navigate("/IndexAdmin");
