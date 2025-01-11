@@ -75,7 +75,7 @@ class TiemposGenerales(db.Model):
     id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
     categoria = db.Column(db.String(1), nullable=False)
-    tiempo = db.Column(db.Float, nullable=False)
+    tiempo = db.Column(db.String(12), nullable=False, default="00:00:00.000")
 
     evento = db.relationship('Evento', backref='tiempos')
     competidor = db.relationship('Competidor', backref='tiempos')
@@ -89,9 +89,10 @@ class TiemposTriatlon(db.Model):
     id_evento = db.Column(db.Integer, db.ForeignKey('evento.id'), nullable=False)
     id_competidor = db.Column(db.Integer, db.ForeignKey('competidor.id'), nullable=False)
     categoria = db.Column(db.String(1), nullable=False)
-    tiempo_natacion = db.Column(db.Float, nullable=False)
-    tiempo_ciclismo = db.Column(db.Float, nullable=False)
-    tiempo_carrera = db.Column(db.Float, nullable=False)
+    tiempo_natacion = db.Column(db.String(12), nullable=False, default="00:00:00.000")
+    tiempo_ciclismo = db.Column(db.String(12), nullable=False, default="00:00:00.000")
+    tiempo_carrera = db.Column(db.String(12), nullable=False, default="00:00:00.000")
+
 
     evento = db.relationship('Evento', backref='tiempos_triatlon')
     competidor = db.relationship('Competidor', backref='tiempos_triatlon')
@@ -386,9 +387,6 @@ def inscribir_competidores():
                     id_evento=evento_id,
                     id_competidor=competidor_id,
                     categoria=categoria,
-                    tiempo_natacion=0,
-                    tiempo_ciclismo=0,
-                    tiempo_carrera=0
                 )
                 db.session.add(tiempo_triatlon)
             else:
@@ -396,7 +394,6 @@ def inscribir_competidores():
                     id_evento=evento_id,
                     id_competidor=competidor_id,
                     categoria=categoria,
-                    tiempo=0
                 )
                 db.session.add(tiempo_general)
                 

@@ -21,50 +21,32 @@ export const DetallesEvento = () => {
   const { estado, colorClase, fechaInicioFormateada, fechaFinFormateada } =
     useEventoEstado(fechaInicio, fechaFin);
 
-    const timeToFloat = (timeString) => {
-      if (!timeString) return 0;
-      const [time, ms] = timeString.split(".");
-      const [hours, minutes, seconds] = time.split(":").map(Number);
-      const milliseconds = ms ? Number(ms.padEnd(3, '0').slice(0, 3)) / 1000 : 0;
-      return Number((hours * 3600 + minutes * 60 + seconds + milliseconds).toFixed(3));
-    };
-    
-    const floatToTime = (floatTime) => {
-      if (!floatTime) return "00:00:00.000";
-      const roundedTime = Number(floatTime.toFixed(3));
-      const hours = Math.floor(roundedTime / 3600);
-      const minutes = Math.floor((roundedTime % 3600) / 60);
-      const seconds = Math.floor(roundedTime % 60);
-      const ms = Math.round((roundedTime % 1) * 1000);
-    
-      return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
-    };
 
-
-  const handleEditStart = (item) => {
-    setEditingId(item.competidor.id);
-    if (evento.disciplina === 'Triatlón') {
-      setEditValues({
-        natacion: item.tiempos.natacion ? floatToTime(item.tiempos.natacion) : "00:00:00.000",
-        ciclismo: item.tiempos.ciclismo ? floatToTime(item.tiempos.ciclismo) : "00:00:00.000",
-        carrera: item.tiempos.carrera ? floatToTime(item.tiempos.carrera) : "00:00:00.000"
-      });
-    } else {
-      setEditValues({
-        tiempo: item.tiempo ? floatToTime(item.tiempo) : "00:00:00.000"
-      });
-    }
-  };
+    const handleEditStart = (item) => {
+      setEditingId(item.competidor.id);
+      if (evento.disciplina === 'Triatlón') { // Triatlón
+        setEditValues({
+          natacion: item.tiempos.natacion !== null ? item.tiempos.natacion : "00:00:00.000",
+          ciclismo: item.tiempos.ciclismo !== null ? item.tiempos.ciclismo : "00:00:00.000",
+          carrera: item.tiempos.carrera !== null ? item.tiempos.carrera : "00:00:00.000"
+        });
+      } else { // Otros eventos
+        setEditValues({
+          tiempo: item.tiempo !== null ? item.tiempo : "00:00:00.000"
+        });
+      }
+    };
   
-  const handleTimeChange = (field, value) => {
-    const timeRegex = /^([0-9]{0,2}:)?([0-9]{0,2}:)?[0-9]{0,2}(\.[0-9]{0,3})?$/;
-    if (timeRegex.test(value)) {
-      setEditValues(prev => ({
-        ...prev,  // Preserve other fields
-        [field]: value
-      }));
-    }
-  };
+    const handleTimeChange = (field, value) => {
+      // Permitir ingreso parcial
+      const partialRegex = /^(\d{0,2})(:\d{0,2}){0,2}(\.\d{0,3})?$/;
+      if (value === "" || partialRegex.test(value)) {
+        setEditValues((prev) => ({
+          ...prev,
+          [field]: value,
+        }));
+      }
+    };
 
   const fetchCompetidores = async () => {
     try {
@@ -85,10 +67,10 @@ export const DetallesEvento = () => {
     const timeRegex = /^([0-9]{2}):([0-9]{2}):([0-9]{2})(\.[0-9]{3})?$/;
     return timeRegex.test(value);
   };
-
-
+  
   const handleSave = async (competidorId) => {
-    if (evento.disciplina === 'Triatlón') {
+    // Validate all time inputs before saving
+    if (evento.disciplina === 'Triatlón') { // Triatlón
       if (
         !validateTimeFormat(editValues.natacion) ||
         !validateTimeFormat(editValues.ciclismo) ||
@@ -97,25 +79,22 @@ export const DetallesEvento = () => {
         alert("Por favor, ingrese tiempos en formato válido (HH:MM:SS.mmm)");
         return;
       }
-    } else {
+    } else { // Otros eventos
       if (!validateTimeFormat(editValues.tiempo)) {
         alert("Por favor, ingrese tiempo en formato válido (HH:MM:SS.mmm)");
         return;
       }
     }
-
+  
     try {
-      const timeValues =
-        evento.disciplina === "Triatlón"
-          ? {
-              natacion: timeToFloat(editValues.natacion),
-              ciclismo: timeToFloat(editValues.ciclismo),
-              carrera: timeToFloat(editValues.carrera),
-            }
-          : {
-              tiempo: timeToFloat(editValues.tiempo),
-            };
-
+      const timeValues = evento.disciplina === 'Triatlón' ? {
+        natacion: editValues.natacion ? editValues.natacion : null,
+        ciclismo: editValues.ciclismo ? editValues.ciclismo : null,
+        carrera: editValues.carrera ? editValues.carrera : null
+      } : {
+        tiempo: editValues.tiempo ? editValues.tiempo : null
+      };
+  
       const response = await fetch(
         `http://localhost:5000/api/eventos/${evento.id}/tiempos/${competidorId}`,
         {
@@ -124,7 +103,7 @@ export const DetallesEvento = () => {
           body: JSON.stringify(timeValues),
         }
       );
-
+  
       if (!response.ok) throw new Error("Error al actualizar tiempos");
       setEditingId(null);
       fetchCompetidores();
@@ -136,19 +115,19 @@ export const DetallesEvento = () => {
   const renderTimeInput = (field, value) => (
     <input
       type="text"
-      value={editValues[field] || ""}
+      value={value || ""}
       onChange={(e) => handleTimeChange(field, e.target.value)}
       onBlur={(e) => {
         if (!e.target.value) {
           handleTimeChange(field, "00:00:00.000");
         }
       }}
-      placeholder="00:00:00.000"
+      placeholder="HH:MM:SS.mmm"
       className="w-32 p-1 border rounded"
     />
   );
 
-  const renderTimeDisplay = (value) => <span>{floatToTime(value)}</span>;
+  const renderTimeDisplay = (value) => <span>{value}</span>;
 
   useEffect(() => {
     evento.fecha_inicio
@@ -170,7 +149,7 @@ export const DetallesEvento = () => {
   };
 
   const renderTablaCompetidores = () => {
-    if (evento.disciplina === "Triatlón") {
+    if (evento.disciplina === 'Triatlón') { // Triatlón
       return (
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -193,7 +172,7 @@ export const DetallesEvento = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 T. Carrera
               </th>
-              {estado === "En Curso" && (
+              {estado /*descomentar  !== "En Curso" */ && (
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Acciones
                 </th>
@@ -209,13 +188,13 @@ export const DetallesEvento = () => {
                 {editingId === item.competidor.id ? (
                   <>
                     <td className="px-6 py-4">
-                      {renderTimeInput("natacion", editValues.natacion)}
+                      {renderTimeInput('natacion', editValues.natacion)}
                     </td>
                     <td className="px-6 py-4">
-                      {renderTimeInput("ciclismo", editValues.ciclismo)}
+                      {renderTimeInput('ciclismo', editValues.ciclismo)}
                     </td>
                     <td className="px-6 py-4">
-                      {renderTimeInput("carrera", editValues.carrera)}
+                      {renderTimeInput('carrera', editValues.carrera)}
                     </td>
                     <td className="px-6 py-4">
                       <button
@@ -243,7 +222,7 @@ export const DetallesEvento = () => {
                     <td className="px-6 py-4">
                       {renderTimeDisplay(item.tiempos.carrera)}
                     </td>
-                    {estado === "En Curso" && (
+                    {estado !== "En Curso" && (
                       <td className="px-6 py-4">
                         <button
                           onClick={() => handleEditStart(item)}
@@ -261,7 +240,8 @@ export const DetallesEvento = () => {
         </table>
       );
     }
-    // Regular events table
+  
+    // Tabla para otros eventos
     return (
       <table className="min-w-full divide-y divide-gray-200">
         <thead>
@@ -278,7 +258,7 @@ export const DetallesEvento = () => {
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Tiempo
             </th>
-            {estado === "En Curso" && (
+            {estado !== "En Curso" && (
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Acciones
               </th>
@@ -294,15 +274,7 @@ export const DetallesEvento = () => {
               {editingId === item.competidor.id ? (
                 <>
                   <td className="px-6 py-4">
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={editValues.tiempo ?? ""}
-                      onChange={(e) =>
-                        setEditValues({ tiempo: parseFloat(e.target.value) })
-                      }
-                      className="w-24 p-1 border rounded"
-                    />
+                    {renderTimeInput('tiempo', editValues.tiempo)}
                   </td>
                   <td className="px-6 py-4">
                     <button
@@ -321,8 +293,10 @@ export const DetallesEvento = () => {
                 </>
               ) : (
                 <>
-                  <td className="px-6 py-4">{item.tiempo || "---"}</td>
-                  {estado === "En Curso" && (
+                  <td className="px-6 py-4">
+                    {renderTimeDisplay(item.tiempo)}
+                  </td>
+                  {estado !== "En Curso" && (
                     <td className="px-6 py-4">
                       <button
                         onClick={() => handleEditStart(item)}
@@ -442,8 +416,8 @@ export const DetallesEvento = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 bg-white">
             <button
-              disabled={estado !== "Próximo"}
-              className="col-span-1 mt-4 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end disabled:opacity-50"
+/* descomentar               disabled={estado !== "Próximo"}
+ */              className="col-span-1 mt-4 bg-accent text-white py-3 px-6 rounded-lg hover:bg-accent/90 transition-colors self-end disabled:opacity-50"
               onClick={InscribirCompetidores}
             >
               Inscribir Competidor
