@@ -63,7 +63,6 @@ export const IndexAdmin = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-    console.log("buscando texto")
   }, [searchTerm, selectedCategories]);  
 
   return (

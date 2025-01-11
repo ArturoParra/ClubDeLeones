@@ -82,7 +82,6 @@ export const IndexEntrenador = () => {
 
   useEffect(() => {
       setCurrentPage(1);
-      console.log("buscando texto")
     }, [searchTerm, selectedCategories]);
 
   return (
